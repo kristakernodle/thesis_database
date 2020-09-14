@@ -95,13 +95,14 @@ class Reviewer:
             with Cursor() as cursor:
                 return save_to_db_main(cursor)
 
-    def __delete_from_db(self, cursor):
-        cursor.execute("DELETE FROM reviewers WHERE reviewer_id = %s", (self.reviewer_id,))
-
     def delete_from_db(self, testing=False, postgresql=None):
+
+        def delete_from_db_main(a_cursor):
+            a_cursor.execute("DELETE FROM reviewers WHERE reviewer_id = %s", (self.reviewer_id,))
+
         if testing:
             with TestingCursor(postgresql) as cursor:
-                self.__delete_from_db(cursor)
+                delete_from_db_main(cursor)
         else:
             with Cursor() as cursor:
-                self.__delete_from_db(cursor)
+                delete_from_db_main(cursor)
