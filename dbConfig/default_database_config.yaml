@@ -1,0 +1,13 @@
+dbDetails:
+  database: default_name
+  host: localhost
+  backupDir: /tmp/dbBackUp
+
+superUser:
+  user: postgres
+  password: postgres
+
+mainUser:
+  user: main
+  password: password
+
