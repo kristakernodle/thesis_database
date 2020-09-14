@@ -57,23 +57,43 @@ class Reviewer:
             with Cursor() as cursor:
                 return from_db_main(reviewer_fullname, scored_dir, reviewer_id, cursor)
 
-    def __save_to_db(self, cursor):
-        cursor.execute("INSERT INTO reviewers (first_name, last_name, toScore_dir, scored_dir) "
-                       "VALUES (%s, %s, %s, %s);", (self.first_name, self.last_name, self.toScore_dir, self.scored_dir))
-
     def save_to_db(self, testing=False, postgresql=None):
 
-        def save_to_db_main(scored_dir, a_cursor):
-            if scored_dir not in list_all_scored_dirs(a_cursor):
-                self.__save_to_db(a_cursor)
-            return self.__from_db_by_scored_dir(a_cursor, scored_dir)
+        def insert_into_db(a_cursor):
+            a_cursor.execute("INSERT INTO reviewers (first_name, last_name, toScore_dir, scored_dir) "
+                             "VALUES (%s, %s, %s, %s);",
+                             (self.first_name, self.last_name, self.toScore_dir, self.scored_dir))
+
+        def update_db_entry(a_cursor):
+            a_cursor.execute("UPDATE reviewers "
+                             "SET (first_name, last_name, toScore_dir, scored_dir) = (%s, %s, %s) "
+                             "WHERE reviewer_id = %s;",
+                             (self.first_name, self.last_name, self.toScore_dir, self.scored_dir, self.reviewer_id))
+
+        def save_to_db_main(a_cursor):
+            if self.from_db(scored_dir=self.scored_dir) is None:
+                insert_into_db(a_cursor)
+                return self.from_db(scored_dir=self.scored_dir)
+            else:
+                print('Reviewer already in database.')
+                if self == self.from_db(scored_dir=self.scored_dir):
+                    return self
+                else:
+                    print('This reviewer information is different from what is in the database.')
+                    update = input('Do you want to update this reviewer? [y/N]: ')
+                    if update.lower() in ['y', 'yes', '1']:
+                        update_db_entry(a_cursor)
+                        return self.from_db(scored_dir=self.scored_dir)
+                    else:
+                        print('Reviewer not updated')
+                        return self
 
         if testing:
             with TestingCursor(postgresql) as cursor:
-                return save_to_db_main(self.scored_dir, cursor)
+                return save_to_db_main(cursor)
         else:
             with Cursor() as cursor:
-                return save_to_db_main(self.scored_dir, cursor)
+                return save_to_db_main(cursor)
 
     def __delete_from_db(self, cursor):
         cursor.execute("DELETE FROM reviewers WHERE reviewer_id = %s", (self.reviewer_id,))
