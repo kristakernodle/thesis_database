@@ -15,7 +15,9 @@ class Experiment:
     def __eq__(self, compare_to):
         if not isinstance(compare_to, Experiment):
             return NotImplemented
-        return self.experiment_id == compare_to.experiment_id
+        return all([self.experiment_name == compare_to.experiment_name,
+                    self.experiment_dir == compare_to.experiment_id,
+                    self.experiment_id == compare_to.experiment_id])
 
     @classmethod
     def from_db(cls, experiment_name=None, experiment_id=None, testing=False, postgresql=None):
