@@ -1,11 +1,11 @@
 from dbMaintenance.tools.cursors import TestingCursor, Cursor
-import utilities as utils
+import utilities as util
 from dbMaintenance.tools.queries import list_all_experiments
 
 
 class Experiment:
     def __init__(self, experiment_name, experiment_dir, experiment_id=None):
-        self.experiment_name = utils.prep_string_for_db(experiment_name)
+        self.experiment_name = util.prep_string_for_db(experiment_name)
         self.experiment_dir = experiment_dir
         self.experiment_id = experiment_id
 
@@ -21,7 +21,7 @@ class Experiment:
 
     @classmethod
     def from_db(cls, experiment_name=None, experiment_id=None, testing=False, postgresql=None):
-        experiment_name = utils.prep_string_for_db(experiment_name)
+        experiment_name = util.prep_string_for_db(experiment_name)
 
         def by_experiment_name(a_cursor, exp_name):
             a_cursor.execute("SELECT * FROM experiments WHERE experiment_name = %s;", (exp_name,))
