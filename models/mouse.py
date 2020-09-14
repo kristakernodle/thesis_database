@@ -18,7 +18,11 @@ class Mouse:
     def __eq__(self, compare_to):
         if not isinstance(compare_to, Mouse):
             return NotImplemented
-        return self.mouse_id == compare_to.mouse_id
+        return all([self.eartag == compare_to.eartag,
+                    self.birthdate == compare_to.birthdate,
+                    self.genotype == compare_to.genotype,
+                    self.sex == compare_to.sex,
+                    self.mouse_id == compare_to.mouse_id])
 
     @classmethod
     def from_db(cls, eartag=None, mouse_id=None, testing=False, postgresql=None):
