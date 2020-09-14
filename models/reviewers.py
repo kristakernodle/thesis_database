@@ -15,7 +15,10 @@ class Reviewer:
     def __eq__(self, compare_to):
         if not isinstance(compare_to, Reviewer):
             return NotImplemented
-        return self.reviewer_id == compare_to.reviewer_id
+        return all([self.first_name == compare_to.first_name,
+                    self.last_name == compare_to.last_name,
+                    self.toScore_dir == self.scored_dir,
+                    self.reviewer_id == compare_to.reviewer_id])
 
     @classmethod
     def from_db(cls, reviewer_fullname=None, scored_dir=None, reviewer_id=None, testing=False, postgresql=None):
