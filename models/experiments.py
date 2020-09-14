@@ -1,5 +1,6 @@
 from dbMaintenance.tools.cursors import TestingCursor, Cursor
 import utilities as utils
+from dbMaintenance.tools.queries import list_all_experiments
 
 
 class Experiment:
@@ -15,13 +16,6 @@ class Experiment:
         if not isinstance(compare_to, Experiment):
             return NotImplemented
         return self.experiment_id == compare_to.experiment_id
-
-    @classmethod
-    def __from_db(cls, cursor, experiment_name):
-        cursor.execute("SELECT * FROM experiments WHERE experiment_name = %s;", (experiment_name,))
-        exp = cursor.fetchone()
-        return cls(experiment_name=exp[2], experiment_dir=exp[1],
-                   experiment_id=exp[0])
 
     @classmethod
     def from_db(cls, experiment_name=None, experiment_id=None, testing=False, postgresql=None):
@@ -56,42 +50,35 @@ class Experiment:
             with Cursor() as cursor:
                 return from_db_main(cursor, experiment_name, experiment_id)
 
-    @classmethod
-    def get_id(cls, experiment_name, testing=False, postgresql=None):
-
-        experiment_name = utils.prep_string_for_db(experiment_name)
-
-        def main(a_cursor, exp_name):
-            a_cursor.execute("SELECT experiment_id FROM experiments WHERE experiment_name = %s;", (exp_name,))
-            exp_id = cursor.fetchall()
-            if exp_id is None:
-                print(f"No experiment in the database with name {exp_name}")
-                return None
-            return utils.list_from_cursor(exp_id)
-
-        if testing:
-            with TestingCursor(postgresql) as cursor:
-                return main(cursor, experiment_name)
-        else:
-            with Cursor() as cursor:
-                return main(cursor, experiment_name)
-
-    def __save_to_db(self, cursor):
-        cursor.execute("INSERT INTO experiments(experiment_dir, experiment_name) VALUES(%s, %s);",
-                       (self.experiment_dir, self.experiment_name))
-
-    def __update_experiment(self, cursor):
-        cursor.execute("UPDATE experiments SET (experiment_name, experiment_dir) = (%s, %s) WHERE experiment_id = %s;",
-                       (self.experiment_name, self.experiment_dir, self.experiment_id))
-
     def save_to_db(self, testing=False, postgresql=None):
 
+        def insert_into_db(a_cursor):
+            a_cursor.execute(
+                "INSERT INTO experiments(experiment_dir, experiment_name) VALUES(%s, %s);",
+                (self.experiment_dir, self.experiment_name))
+
+        def update_db_entry(a_cursor):
+            a_cursor.execute(
+                "UPDATE experiments SET (experiment_name, experiment_dir) = (%s, %s) WHERE experiment_id = %s;",
+                (self.experiment_name, self.experiment_dir, self.experiment_id))
+
         def save_to_db_main(a_cursor):
-            if self.experiment_id not in list_all_experiment_ids(a_cursor):
-                self.__save_to_db(a_cursor)
+            if self.experiment_name not in list_all_experiments(a_cursor):
+                insert_into_db(a_cursor)
+                return self.from_db(experiment_name=self.experiment_name)
             else:
-                self.__update_experiment(a_cursor)
-            return self.__from_db(a_cursor, self.experiment_name)
+                print('Experiment already in database.')
+                if self == self.from_db(experiment_name=self.experiment_name):
+                    return self
+                else:
+                    print('This experiment information is different from what is in the database.')
+                    update = input('Do you want to update this experiment? [y/N]: ')
+                    if update.lower() in ['y', 'yes', '1']:
+                        update_db_entry(a_cursor)
+                        return self.from_db(experiment_name=self.experiment_name)
+                    else:
+                        print('Experiment not updated')
+                        return self
 
         if testing:
             with TestingCursor(postgresql) as cursor:
@@ -102,12 +89,12 @@ class Experiment:
 
     def delete_from_db(self, testing=False, postgresql=None):
 
-        def __delete_from_db(cursor, experiment_id):
-            cursor.execute("DELETE FROM experiments WHERE experiment_id = %s", (experiment_id,))
+        def delete_from_db_main(a_cursor, experiment_id):
+            a_cursor.execute("DELETE FROM experiments WHERE experiment_id = %s", (experiment_id,))
 
         if testing:
             with TestingCursor(postgresql) as cursor:
-                __delete_from_db(cursor, self.experiment_id)
+                delete_from_db_main(cursor, self.experiment_id)
         else:
             with Cursor() as cursor:
-                __delete_from_db(cursor, self.experiment_id)
+                delete_from_db_main(cursor, self.experiment_id)

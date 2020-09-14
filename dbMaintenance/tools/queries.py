@@ -14,3 +14,4 @@ def list_all_experiments(cursor):
 def list_all_experiment_ids(cursor):
     cursor.execute("SELECT experiment_id FROM experiments;")
     return util.list_from_cursor(cursor.fetchall())
+
