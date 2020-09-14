@@ -15,3 +15,13 @@ def list_all_experiment_ids(cursor):
     cursor.execute("SELECT experiment_id FROM experiments;")
     return util.list_from_cursor(cursor.fetchall())
 
+
+def list_all_scored_dirs(cursor):
+    cursor.execute("SELECT scored_dir FROM reviewers;")
+    return list(item for tup in cursor.fetchall() for item in tup)
+
+
+def list_all_reviewer_ids(cursor):
+    cursor.execute("SELECT reviewer_id FROM reviewers;")
+    return list(item for tup in cursor.fetchall() for item in tup)
+

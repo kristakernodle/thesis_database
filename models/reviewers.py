@@ -1,15 +1,4 @@
-from database.cursors import Cursor, TestingCursor
-
-
-def list_all_scored_dirs(cursor):
-    cursor.execute("SELECT scored_dir FROM reviewers;")
-    return list(item for tup in cursor.fetchall() for item in tup)
-
-
-# TODO: Testing - list all reviewer ids
-def list_all_reviewer_ids(cursor):
-    cursor.execute("SELECT reviewer_id FROM reviewers;")
-    return list(item for tup in cursor.fetchall() for item in tup)
+from dbMaintenance.tools.cursors import Cursor, TestingCursor
 
 
 class Reviewer:
@@ -23,69 +12,50 @@ class Reviewer:
     def __str__(self):
         return f"< Reviewer {self.first_name} {self.last_name} >"
 
-    def __repr__(self):
-        return f"< Reviewer {self.first_name} {self.last_name} >"
-
     def __eq__(self, compare_to):
         if not isinstance(compare_to, Reviewer):
             return NotImplemented
         return self.reviewer_id == compare_to.reviewer_id
 
     @classmethod
-    def __from_db_by_scored_dir(cls, cursor, scored_dir):
-        cursor.execute("SELECT * FROM reviewers WHERE scored_dir = %s;", (scored_dir,))
-        reviewer_data = cursor.fetchone()
-        if reviewer_data is None:
-            print(f"No reviewer in the database with scored directory {scored_dir}")
-            return None
-        return cls(first_name=reviewer_data[1], last_name=reviewer_data[2], toScore_dir=reviewer_data[3],
-                   scored_dir=reviewer_data[4], reviewer_id=reviewer_data[0])
-
-    @classmethod
-    def __from_db_by_reviewer_id(cls, cursor, reviewer_id):
-        cursor.execute("SELECT * FROM reviewers WHERE reviewer_id = %s;", (reviewer_id,))
-        reviewer_data = cursor.fetchone()
-        if reviewer_data is None:
-            print(f"No reviewer in the database with ID {reviewer_id}")
-            return None
-        return cls(first_name=reviewer_data[1], last_name=reviewer_data[2], toScore_dir=reviewer_data[3],
-                   scored_dir=reviewer_data[4], reviewer_id=reviewer_data[0])
-
-    @classmethod
-    def __from_db_by_reviewer_fullname(cls, cursor, reviewer_fullname):
-        reviewer_name = reviewer_fullname.split(' ')
-        cursor.execute("SELECT * FROM reviewers WHERE first_name = %s AND last_name = %s;",
-                       (reviewer_name[0], reviewer_name[1]))
-        reviewer_data = cursor.fetchone()
-        if reviewer_data is None:
-            print(f"No reviewer in the database with name {reviewer_name[0]} {reviewer_name[1]}")
-            return None
-        return cls(first_name=reviewer_data[1], last_name=reviewer_data[2], toScore_dir=reviewer_data[3],
-                   scored_dir=reviewer_data[4], reviewer_id=reviewer_data[0])
-
-    @classmethod
     def from_db(cls, reviewer_fullname=None, scored_dir=None, reviewer_id=None, testing=False, postgresql=None):
-        if reviewer_id is None and reviewer_fullname is None:
-            if testing:
-                with TestingCursor(postgresql) as cursor:
-                    return cls.__from_db_by_scored_dir(cursor, scored_dir)
+
+        def by_id(a_cursor, a_reviewer_id):
+            a_cursor.execute("SELECT * FROM reviewers WHERE reviewer_id = %s;", (a_reviewer_id,))
+            return cursor.fetchone()
+
+        def by_scored_dir(a_cursor, a_scored_dir):
+            a_cursor.execute("SELECT * FROM reviewers WHERE scored_dir = %s;", (a_scored_dir,))
+            return cursor.fetchone()
+
+        def by_fullname(a_cursor, a_reviewer_fullname):
+            a_reviewer_name = a_reviewer_fullname.split(' ')
+            cursor.execute("SELECT * FROM reviewers WHERE first_name = %s AND last_name = %s;",
+                           (a_reviewer_name[0], a_reviewer_name[1]))
+            return cursor.fetchone()
+
+        def from_db_main(a_reviewer_fullname, a_scored_dir, a_reviewer_id, a_cursor):
+            if a_reviewer_id is not None:
+                reviewer_data = by_id(a_cursor, a_reviewer_id)
+            elif a_scored_dir is not None:
+                reviewer_data = by_scored_dir(a_cursor, a_scored_dir)
+            elif a_reviewer_fullname is not None:
+                reviewer_data = by_fullname(a_cursor, a_reviewer_fullname)
             else:
-                with Cursor() as cursor:
-                    return cls.__from_db_by_scored_dir(cursor, scored_dir)
-        elif scored_dir is None and reviewer_fullname is None:
-            if testing:
-                with TestingCursor(postgresql) as cursor:
-                    return cls.__from_db_by_reviewer_id(cursor, reviewer_id)
-            else:
-                with Cursor() as cursor:
-                    return cls.__from_db_by_reviewer_id(cursor, reviewer_id)
-        elif reviewer_id is None and scored_dir is None:
-            if testing:
-                with TestingCursor(postgresql) as cursor:
-                    return cls.__from_db_by_reviewer_fullname(cursor, reviewer_fullname)
-            else:
-                with Cursor() as cursor:
-                    return cls.__from_db_by_reviewer_fullname(cursor, reviewer_fullname)
+                reviewer_data = None
+
+            if reviewer_data is None:
+                print(f"No reviewer in the database with identifier.")
+                return None
+            return cls(first_name=reviewer_data[1], last_name=reviewer_data[2], toScore_dir=reviewer_data[3],
+                       scored_dir=reviewer_data[4], reviewer_id=reviewer_data[0])
+
+        if testing:
+            with TestingCursor(postgresql) as cursor:
+                return from_db_main(reviewer_fullname, scored_dir, reviewer_id, cursor)
+        else:
+            with Cursor() as cursor:
+                return from_db_main(reviewer_fullname, scored_dir, reviewer_id, cursor)
 
     def __save_to_db(self, cursor):
         cursor.execute("INSERT INTO reviewers (first_name, last_name, toScore_dir, scored_dir) "
