@@ -35,9 +35,47 @@ def list_all_folder_dir(cursor):
     cursor.execute("SELECT folder_dir FROM folders;")
     return list(item for tup in cursor.fetchall() for item in tup)
 
+
 def list_all_trial_dirs(cursor):
     cursor.execute("SELECT trial_dir FROM trials;")
     return list(item for tup in cursor.fetchall() for item in tup)
+
+
+def list_all_blind_names(cursor):
+    cursor.execute("SELECT blind_name FROM blind_folders;")
+    return list(item for tup in cursor.fetchall() for item in tup)
+
+
+# @classmethod
+# def list_all_blind_folders(cls, experiment_id, testing=False, postgresql=None):
+#
+#     def main_list_all_blind_folders(a_cursor):
+#         a_cursor.execute("SELECT blind_folder_id FROM blind_folders_all_upstream_ids WHERE experiment_id = %s",
+#                          (experiment_id,))
+#         all_folder_ids = a_cursor.fetchall()
+#         return [cls.from_db(blind_folder_id=blind_folder_id[0]) for blind_folder_id in all_folder_ids]
+#
+#     if testing:
+#         with TestingCursor(postgresql) as cursor:
+#             return main_list_all_blind_folders(cursor)
+#     else:
+#         with Cursor() as cursor:
+#             return main_list_all_blind_folders(cursor)
+
+
+# @classmethod
+# def list_all_blind_names(cls, testing=False, postgresql=None):
+#
+#     def main_list_all_blind_names(a_cursor):
+#         a_cursor.execute("SELECT blind_name FROM blind_folders;")
+#         return list(item for tup in a_cursor.fetchall() for item in tup)
+#
+#     if testing:
+#         with TestingCursor(postgresql) as cursor:
+#             return main_list_all_blind_names(cursor)
+#     else:
+#         with Cursor() as cursor:
+#             return main_list_all_blind_names(cursor)
 
 
 # @classmethod

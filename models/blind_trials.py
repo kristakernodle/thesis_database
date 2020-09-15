@@ -1,4 +1,4 @@
-from database.cursors import TestingCursor, Cursor
+from dbMaintenance.tools.cursors import Cursor, TestingCursor
 
 
 class BlindTrial:
@@ -14,78 +14,97 @@ class BlindTrial:
     def __eq__(self, compare_to):
         if not isinstance(compare_to, BlindTrial):
             return NotImplemented
-        return self.blind_trial_id == compare_to.blind_trial_id
-
-    @classmethod
-    def __from_db(cls, cursor, full_path):
-        cursor.execute("SELECT * FROM blind_trials WHERE full_path = %s", (full_path,))
-        blind_trial_data = cursor.fetchone()
-        if blind_trial_data is None:
-            print(f"No blind trial in the database with full path {full_path}")
-            return None
-        return cls(trial_id=blind_trial_data[1], folder_id=blind_trial_data[2],
-                   full_path=blind_trial_data[3], blind_trial_id=blind_trial_data[0])
-
-    @classmethod
-    def __from_db_blind_trial_id(cls, cursor, blind_trial_id):
-        cursor.execute("SELECT * FROM blind_trials WHERE blind_trial_id = %s;", (blind_trial_id,))
-        blind_trial_data = cursor.fetchone()
-        if blind_trial_data is None:
-            print(f"No blind trial in the database with full path {blind_trial_id}")
-            return None
-        return cls(trial_id=blind_trial_data[1], folder_id=blind_trial_data[2],
-                   full_path=blind_trial_data[3], blind_trial_id=blind_trial_data[0])
-
-    @classmethod
-    def __from_db_reviewer_trial_id(cls, cursor, reviewer_id, trial_id):
-        cursor.execute("SELECT * FROM blind_trials_all_upstream_ids WHERE reviewer_id = %s and trial_id = %s;",
-                       (reviewer_id, trial_id))
-        blind_trial_data = cursor.fetchone()
-        if blind_trial_data is None:
-            print(f"No blind trial in the database with reviewer and trial id")
-            return None
-        return cls(trial_id=blind_trial_data[1], folder_id=blind_trial_data[2],
-                   full_path=blind_trial_data[3], blind_trial_id=blind_trial_data[0])
+        return all([self.trial_id == compare_to.trial_id,
+                    self.folder_id == compare_to.folder_id,
+                    self.full_path == compare_to.full_path,
+                    self.blind_trial_id == compare_to.blind_trial_id])
 
     @classmethod
     def from_db(cls, full_path=None, blind_trial_id=None, reviewer_id=None, trial_id=None, testing=False,
                 postgresql=None):
-        if blind_trial_id is None and reviewer_id is None and trial_id is None:
-            if testing:
-                with TestingCursor(postgresql) as cursor:
-                    return cls.__from_db(cursor, full_path)
-            else:
-                with Cursor() as cursor:
-                    return cls.__from_db(cursor, full_path)
-        elif full_path is None and reviewer_id is None and trial_id is None:
-            if testing:
-                with TestingCursor(postgresql) as cursor:
-                    return cls.__from_db_blind_trial_id(cursor, blind_trial_id)
-            else:
-                with Cursor() as cursor:
-                    return cls.__from_db_blind_trial_id(cursor, blind_trial_id)
-        elif reviewer_id is not None and trial_id is not None and full_path is None and blind_trial_id is None:
-            if testing:
-                with TestingCursor(postgresql) as cursor:
-                    return cls.__from_db_reviewer_trial_id(cursor, reviewer_id, trial_id)
-            else:
-                with Cursor() as cursor:
-                    return cls.__from_db_reviewer_trial_id(cursor, reviewer_id, trial_id)
 
-    def save_to_db(self, testing=False, postgresql=None):
+        def by_full_path(a_cursor, a_full_path):
+            a_cursor.execute("SELECT * FROM blind_trials WHERE full_path = %s", (a_full_path,))
+            return a_cursor.fetchone()
 
-        def main(a_cursor, full_path):
-            try:
-                cursor.execute(
-                    "INSERT INTO blind_trials (trial_id, folder_id, full_path) VALUES (%s, %s, %s);",
-                    (self.trial_id, self.folder_id, self.full_path))
-            except:
-                print("Already in db")
-            return self.__from_db(a_cursor, full_path)
+        def by_id(a_cursor, a_blind_trial_id):
+            a_cursor.execute("SELECT * FROM blind_trials WHERE blind_trial_id = %s;", (a_blind_trial_id,))
+            return a_cursor.fetchone()
+
+        def by_reviewer_trial_ids(a_cursor, a_reviewer_id, a_trial_id):
+            a_cursor.execute("SELECT * FROM blind_trials_all_upstream_ids WHERE reviewer_id = %s and trial_id = %s;",
+                             (a_reviewer_id, a_trial_id))
+            return a_cursor.fetchone()
+
+        def from_db_main(a_cursor, a_full_path, a_blind_trial_id, a_reviewer_id, a_trial_id):
+            if a_blind_trial_id is not None:
+                blind_trial_data = by_id(a_cursor, a_blind_trial_id)
+            elif full_path is not None:
+                blind_trial_data = by_full_path(a_cursor, a_full_path)
+            elif reviewer_id is not None and trial_id is not None:
+                blind_trial_data = by_reviewer_trial_ids(a_cursor, a_reviewer_id, a_trial_id)
+            else:
+                blind_trial_data = None
+
+            if blind_trial_data is None:
+                print(f"No blind trial in the database with reviewer and trial id")
+                return None
+            return cls(trial_id=blind_trial_data[1], folder_id=blind_trial_data[2],
+                       full_path=blind_trial_data[3], blind_trial_id=blind_trial_data[0])
 
         if testing:
             with TestingCursor(postgresql) as cursor:
-                return main(cursor, self.full_path)
+                return from_db_main(cursor, full_path, blind_trial_id, reviewer_id, trial_id)
         else:
             with Cursor() as cursor:
-                return main(cursor, self.full_path)
+                return from_db_main(cursor, full_path, blind_trial_id, reviewer_id, trial_id)
+
+    def save_to_db(self, testing=False, postgresql=None):
+
+        def insert_into_db(a_cursor):
+            a_cursor.execute("INSERT INTO blind_trials (trial_id, folder_id, full_path) VALUES (%s, %s, %s);",
+                             (self.trial_id, self.folder_id, self.full_path))
+
+        def update_db_entry(a_cursor):
+            a_cursor.execute("UPDATE blind_trials "
+                             "SET (trial_id, folder_id, full_path) = (%s, %s, %s) "
+                             "WHERE blind_trial_id = %s;",
+                             (self.trial_id, self.folder_id, self.full_path, self.blind_trial_id))
+
+        def save_to_db_main(a_cursor):
+            if self.from_db(blind_trial_id=self.blind_trial_id) is None:
+                insert_into_db(a_cursor)
+                return self.from_db(blind_trial_id=self.blind_trial_id)
+            else:
+                print('Blind trial already in database.')
+                if self == self.from_db(blind_trial_id=self.blind_trial_id):
+                    return self
+                else:
+                    print('This blind trial information is different from what is in the database.')
+                    update = input('Do you want to update this blind trial? [y/N]: ')
+                    if update.lower() in ['y', 'yes', '1']:
+                        update_db_entry(a_cursor)
+                        return self.from_db(blind_trial_id=self.blind_trial_id)
+                    else:
+                        print('Blind trial not updated')
+                        return self
+
+        if testing:
+            with TestingCursor(postgresql) as cursor:
+                return save_to_db_main(cursor)
+        else:
+            with Cursor() as cursor:
+                return save_to_db_main(cursor)
+
+    def delete_from_db(self, testing=False, postgresql=None):
+
+        def delete_from_db_main(a_cursor):
+            a_cursor.execute("DELETE FROM blind_trials WHERE blind_trial_id = %s", (self.blind_trial_id,))
+
+        if testing:
+            with TestingCursor(postgresql) as cursor:
+                delete_from_db_main(cursor)
+        else:
+            with Cursor() as cursor:
+                delete_from_db_main(cursor)
+
