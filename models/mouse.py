@@ -35,11 +35,11 @@ class Mouse:
             a_cursor.execute("SELECT * FROM mouse WHERE mouse_id = %s;", (a_mouse_id,))
             return cursor.fetchone()
 
-        def from_db_main(a_cursor, eartag, mouse_id):
+        def from_db_main(a_cursor, a_eartag, a_mouse_id):
             if eartag is not None:
-                mouse_data = by_eartag(a_cursor, eartag)
+                mouse_data = by_eartag(a_cursor, a_eartag)
             elif mouse_id is not None:
-                mouse_data = by_id(a_cursor, mouse_id)
+                mouse_data = by_id(a_cursor, a_mouse_id)
             else:
                 mouse_data = None
 
@@ -60,7 +60,7 @@ class Mouse:
 
         def insert_into_db(a_cursor):
             a_cursor.execute("INSERT INTO mouse (eartag, birthdate, genotype, sex) VALUES (%s, %s, %s, %s);",
-                           (self.eartag, self.birthdate, util.encode_genotype(self.genotype), self.sex))
+                             (self.eartag, self.birthdate, util.encode_genotype(self.genotype), self.sex))
 
         def update_db_entry(a_cursor):
             a_cursor.execute("UPDATE mouse "
@@ -88,10 +88,10 @@ class Mouse:
         if testing:
             with TestingCursor(postgresql) as cursor:
                 if self.from_db(eartag=self.eartag) is None:
-                    return save_to_db_main(self.eartag, cursor)
+                    return save_to_db_main(cursor)
         else:
             with Cursor() as cursor:
-                return save_to_db_main(self.eartag, cursor)
+                return save_to_db_main(cursor)
 
     def delete_from_db(self, testing=False, postgresql=None):
 
