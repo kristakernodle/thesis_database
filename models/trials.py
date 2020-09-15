@@ -1,5 +1,4 @@
 import utilities as util
-from models.experiments import Experiment
 from dbMaintenance.tools.cursors import Cursor, TestingCursor
 
 
@@ -18,103 +17,90 @@ class Trial:
     def __eq__(self, compare_to):
         if not isinstance(compare_to, Trial):
             return NotImplemented
-        return self.trial_id == compare_to.trial_id
-
-    @classmethod
-    def __from_db_by_dir(cls, cursor, trial_dir):
-        cursor.execute("SELECT * FROM trials WHERE trial_dir = %s", (trial_dir,))
-        trial_data = cursor.fetchone()
-        if trial_data is None:
-            print(f"No trial in the database with directory {trial_dir}")
-            return None
-        return cls(experiment_id=trial_data[1], folder_id=trial_data[2], trial_dir=trial_data[3],
-                   trial_date=trial_data[4], trial_id=trial_data[0])
-
-    @classmethod
-    def __from_db_by_id(cls, cursor, trial_id):
-        cursor.execute("SELECT * FROM trials WHERE trial_id = %s", (trial_id,))
-        trial_data = cursor.fetchone()
-        if trial_data is None:
-            print(f"No trial in the database with directory {trial_id}")
-            return None
-        return cls(experiment_id=trial_data[1], folder_id=trial_data[2], trial_dir=trial_data[3],
-                   trial_date=trial_data[4], trial_id=trial_data[0])
+        return all([self.experiment_id == compare_to.experiment_id,
+                    self.folder_id == compare_to.folder_id,
+                    self.trial_dir == compare_to.trial_dir,
+                    self.trial_date == compare_to.trial_date,
+                    self.trial_id == compare_to.trial_id])
 
     @classmethod
     def from_db(cls, trial_dir=None, trial_id=None, testing=False, postgresql=None):
-        if trial_id is None:
-            if testing:
-                with TestingCursor(postgresql) as cursor:
-                    return cls.__from_db_by_dir(cursor, trial_dir)
+        def by_dir(a_cursor, a_trial_dir):
+            a_cursor.execute("SELECT * FROM trials WHERE trial_dir = %s", (a_trial_dir,))
+            return a_cursor.fetchone()
+
+        def by_id(a_cursor, a_trial_id):
+            a_cursor.execute("SELECT * FROM trials WHERE trial_id = %s", (a_trial_id,))
+            return a_cursor.fetchone()
+
+        def from_db_main(a_cursor, a_trial_dir, a_trial_id):
+            if a_trial_id is not None:
+                trial_data = by_id(a_cursor, a_trial_id)
+            elif a_trial_dir is not None:
+                trial_data = by_dir(a_cursor, a_trial_dir)
             else:
-                with Cursor() as cursor:
-                    return cls.__from_db_by_dir(cursor, trial_dir)
-        elif trial_dir is None:
-            if testing:
-                with TestingCursor(postgresql) as cursor:
-                    return cls.__from_db_by_id(cursor, trial_id)
-            else:
-                with Cursor() as cursor:
-                    return cls.__from_db_by_id(cursor, trial_id)
+                trial_data = None
+
+            if trial_data is None:
+                print(f"No trial in the database with directory {a_trial_id}")
+                return None
+            return cls(experiment_id=trial_data[1], folder_id=trial_data[2], trial_dir=trial_data[3],
+                       trial_date=trial_data[4], trial_id=trial_data[0])
+
+        if testing:
+            with TestingCursor(postgresql) as cursor:
+                return from_db_main(cursor, trial_dir, trial_id)
+        else:
+            with Cursor() as cursor:
+                return from_db_main(cursor, trial_dir, trial_id)
 
     def save_to_db(self, testing=False, postgresql=None):
 
-        def main(a_cursor, trial_dir):
-            cursor.execute(
+        def insert_into_db(a_cursor):
+            a_cursor.execute(
                 "INSERT INTO trials (experiment_id, folder_id, trial_dir, trial_date) VALUES (%s, %s, %s, %s);",
                 (self.experiment_id, self.folder_id, self.trial_dir,
                  util.convert_date_int_yyyymmdd(self.trial_date)))
-            return self.__from_db_by_dir(a_cursor, trial_dir)
+
+        def update_db_entry(a_cursor):
+            a_cursor.execute("UPDATE trials "
+                             "SET (trial_dir, trial_date) = (%s, %s) "
+                             "WHERE trial_id = %s;",
+                             (self.trial_dir, self.trial_date, self.trial_id))
+
+        def save_to_db_main(a_cursor):
+            if self.from_db(trial_id=self.trial_id) is None:
+                insert_into_db(a_cursor)
+                return self.from_db(trial_id=self.trial_id)
+            else:
+                print('Trial already in database.')
+                if self == self.from_db(trial_id=self.trial_id):
+                    return self
+                else:
+                    print('This trial information is different from what is in the database.')
+                    update = input('Do you want to update this trial? [y/N]: ')
+                    if update.lower() in ['y', 'yes', '1']:
+                        update_db_entry(a_cursor)
+                        return self.from_db(trial_id=self.trial_id)
+                    else:
+                        print('Trial not updated')
+                        return self
 
         if testing:
             with TestingCursor(postgresql) as cursor:
-                return main(cursor, self.trial_dir)
+                return save_to_db_main(cursor)
         else:
             with Cursor() as cursor:
-                return main(cursor, self.trial_dir)
+                return save_to_db_main(cursor)
 
-    @classmethod
-    def list_participants(cls, experiment_name, testing=False, postgresql=None):
+    def delete_from_db(self, testing=False, postgresql=None):
 
-        def main(a_cursor, experiment_id):
-            a_cursor.execute("SELECT eartag FROM all_participants_all_trials "
-                             "WHERE experiment_id = %s;", (experiment_id,))
-            no_dups = sorted(set(util.list_from_cursor(cursor.fetchall())), key=int)
-            return no_dups
-
-        experiment = Experiment.from_db(experiment_name, testing, postgresql)
+        def delete_from_db_main(a_cursor):
+            a_cursor.execute("DELETE FROM mouse WHERE mouse_id = %s", (self.mouse_id,))
 
         if testing:
             with TestingCursor(postgresql) as cursor:
-                return main(cursor, experiment.experiment_id)
+                delete_from_db_main(cursor)
         else:
             with Cursor() as cursor:
-                return main(cursor, experiment.experiment_id)
-
-    # def __delete_from_db(self, cursor):
-    #     cursor.execute("DELETE FROM mouse WHERE mouse_id = %s", (self.mouse_id,))
-    #
-    # def delete_from_db(self, testing=False, postgresql=None):
-    #     if testing:
-    #         with TestingCursor(postgresql) as cursor:
-    #             self.__delete_from_db(cursor)
-    #     else:
-    #         with Cursor() as cursor:
-    #             self.__delete_from_db(cursor)
-
-    @classmethod
-    def list_trial_dir_for_folder(cls, folder_id, testing=False, postgresql=None):
-        if testing:
-            with TestingCursor(postgresql) as cursor:
-                cursor.execute("SELECT trial_dir FROM trials WHERE folder_id = %s;", (folder_id,))
-                return list(item for tup in cursor.fetchall() for item in tup)
-        else:
-            with Cursor() as cursor:
-                cursor.execute("SELECT trial_dir FROM trials WHERE folder_id = %s;", (folder_id,))
-                return list(item for tup in cursor.fetchall() for item in tup)
-
-    @classmethod
-    def list_trials_for_folder(cls, folder_id, testing=False, postgresql=None):
-        all_trial_dirs = cls.list_trial_dir_for_folder(folder_id, testing, postgresql)
-        return [cls.from_db(trial_dir=trial_dir, testing=testing, postgresql=postgresql) for trial_dir in
-                all_trial_dirs]
+                delete_from_db_main(cursor)

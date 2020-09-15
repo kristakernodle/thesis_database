@@ -35,6 +35,48 @@ def list_all_folder_dir(cursor):
     cursor.execute("SELECT folder_dir FROM folders;")
     return list(item for tup in cursor.fetchall() for item in tup)
 
+def list_all_trial_dirs(cursor):
+    cursor.execute("SELECT trial_dir FROM trials;")
+    return list(item for tup in cursor.fetchall() for item in tup)
+
+
+# @classmethod
+# def list_trial_dir_for_folder(cls, folder_id, testing=False, postgresql=None):
+#     if testing:
+#         with TestingCursor(postgresql) as cursor:
+#             cursor.execute("SELECT trial_dir FROM trials WHERE folder_id = %s;", (folder_id,))
+#             return list(item for tup in cursor.fetchall() for item in tup)
+#     else:
+#         with Cursor() as cursor:
+#             cursor.execute("SELECT trial_dir FROM trials WHERE folder_id = %s;", (folder_id,))
+#             return list(item for tup in cursor.fetchall() for item in tup)
+#
+# @classmethod
+# def list_trials_for_folder(cls, folder_id, testing=False, postgresql=None):
+#     all_trial_dirs = cls.list_trial_dir_for_folder(folder_id, testing, postgresql)
+#     return [cls.from_db(trial_dir=trial_dir, testing=testing, postgresql=postgresql) for trial_dir in
+#             all_trial_dirs]
+
+
+# @classmethod
+# def list_participants(cls, experiment_name, testing=False, postgresql=None):
+#
+#     def main(a_cursor, experiment_id):
+#         a_cursor.execute("SELECT eartag FROM all_participants_all_trials "
+#                          "WHERE experiment_id = %s;", (experiment_id,))
+#         no_dups = sorted(set(util.list_from_cursor(cursor.fetchall())), key=int)
+#         return no_dups
+#
+#     experiment = Experiment.from_db(experiment_name, testing, postgresql)
+#
+#     if testing:
+#         with TestingCursor(postgresql) as cursor:
+#             return main(cursor, experiment.experiment_id)
+#     else:
+#         with Cursor() as cursor:
+#             return main(cursor, experiment.experiment_id)
+
+
 # @classmethod
 # def list_all_folders(cls, experiment_id, testing=False, postgresql=None):
 #
