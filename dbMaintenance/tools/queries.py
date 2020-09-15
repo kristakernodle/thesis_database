@@ -30,21 +30,45 @@ def list_all_detail_ids(cursor):
     cursor.execute("SELECT detail_id FROM participant_details;")
     return util.list_from_cursor(cursor.fetchall())
 
-    # # To do Write test for this
-    # @classmethod
-    # def list_all_sessions(cls, mouse, experiment, testing=False, postgresql=None):
-    #
-    #     def main_list_all_sessions(a_cursor, mouse_id, experiment_id):
-    #         a_cursor.execute("SELECT session_dir FROM sessions WHERE mouse_id = %s AND experiment_id = %s",
-    #                          (mouse_id, experiment_id))
-    #         return list(Session.from_db(session_dir=item) for tup in a_cursor.fetchall() for item in tup)
-    #
-    #     if testing:
-    #         with TestingCursor(postgresql) as cursor:
-    #             return main_list_all_sessions(cursor, mouse.mouse_id, experiment.experiment_id)
-    #     else:
-    #         with Cursor() as cursor:
-    #             return main_list_all_sessions(cursor, mouse.mouse_id, experiment.experiment_id)
+
+def list_all_folder_dir(cursor):
+    cursor.execute("SELECT folder_dir FROM folders;")
+    return list(item for tup in cursor.fetchall() for item in tup)
+
+# @classmethod
+# def list_all_folders(cls, experiment_id, testing=False, postgresql=None):
+#
+#     def main_list_all_folders(a_cursor):
+#         a_cursor.execute("SELECT folder_id FROM folders_all_upstream_ids WHERE experiment_id = %s",
+#                          (experiment_id,))
+#         all_folder_ids = a_cursor.fetchall()
+#         return [cls.from_db(folder_id=folder_id[0]) for folder_id in all_folder_ids]
+#
+#     if testing:
+#         with TestingCursor(postgresql) as cursor:
+#             return main_list_all_folders(cursor)
+#     else:
+#         with Cursor() as cursor:
+#             return main_list_all_folders(cursor)
+
+
+# # To do Write test for this
+# @classmethod
+# def list_all_sessions(cls, mouse, experiment, testing=False, postgresql=None):
+#
+#     def main_list_all_sessions(a_cursor, mouse_id, experiment_id):
+#         a_cursor.execute("SELECT session_dir FROM sessions WHERE mouse_id = %s AND experiment_id = %s",
+#                          (mouse_id, experiment_id))
+#         return list(Session.from_db(session_dir=item) for tup in a_cursor.fetchall() for item in tup)
+#
+#     if testing:
+#         with TestingCursor(postgresql) as cursor:
+#             return main_list_all_sessions(cursor, mouse.mouse_id, experiment.experiment_id)
+#     else:
+#         with Cursor() as cursor:
+#             return main_list_all_sessions(cursor, mouse.mouse_id, experiment.experiment_id)
+
+
 # def list_participants_for_experiment(experiment_name, testing=False, postgresql=None):
 #
 #     def list_participants_main(a_cursor, exp_id):
