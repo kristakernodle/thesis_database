@@ -101,7 +101,7 @@ def create_blind_trials_table(a_cursor):
 
 # CREATE ALL TABLES
 def create_all_tables_main(db_details, main_user):
-    Database.initialize(database=db_details['name'],
+    Database.initialize(database=db_details['database'],
                         host=db_details['host'],
                         port=5432,
                         user=main_user['user'],

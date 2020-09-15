@@ -63,7 +63,7 @@ def create_view_blind_trials_all_upstream_ids(a_cursor):
 
 # CREATE ALL VIEWS
 def create_views_main(db_details, main_user):
-    Database.initialize(database=db_details['name'],
+    Database.initialize(database=db_details['database'],
                         host=db_details['host'],
                         port=5432,
                         user=main_user['user'],

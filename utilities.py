@@ -3,6 +3,8 @@ import random
 import re
 import string
 
+import yaml
+
 
 def random_string_generator(len_string=10):
     """Generates a random string of length len_string.
@@ -91,3 +93,16 @@ def list_from_cursor(cursor_fetch):
 #         contents = list(csv.reader(f))
 #     return contents
 
+def read_config(yaml_full_path):
+    with open(yaml_full_path) as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+    return data['dbDetails'], data['superUser'], data['mainUser']
+
+
+def write_config(db_details, super_user, main_user, yaml_full_path):
+    data = {'dbDetails': db_details,
+            'superUser': super_user,
+            'mainUser': main_user
+            }
+    with open(yaml_full_path, 'w+') as f:
+        yaml.dump(data, f)
