@@ -1,3 +1,6 @@
+from dbMaintenance.tools.database import Database
+from dbMaintenance.tools.cursors import Cursor
+
 
 def create_view_all_participants_all_experiments(a_cursor):
     a_cursor.execute(
@@ -56,4 +59,19 @@ def create_view_blind_trials_all_upstream_ids(a_cursor):
     JOIN sessions on sessions.session_id = folders.session_id
     JOIN blind_folders on blind_folders.folder_id = folders.folder_id;
     """)
+
+
+# CREATE ALL VIEWS
+def create_views_main(db_details, main_user):
+    Database.initialize(database=db_details['name'],
+                        host=db_details['host'],
+                        port=5432,
+                        user=main_user['user'],
+                        password=main_user['password'])
+    with Cursor() as cursor:
+        create_view_all_participants_all_experiments(cursor)
+        create_view_folders_all_upstream_ids(cursor)
+        create_view_trials_all_upstream_ids(cursor)
+        create_view_blind_folders_all_upstream_ids(cursor)
+        create_view_blind_trials_all_upstream_ids(cursor)
 

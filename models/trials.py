@@ -96,7 +96,7 @@ class Trial:
     def delete_from_db(self, testing=False, postgresql=None):
 
         def delete_from_db_main(a_cursor):
-            a_cursor.execute("DELETE FROM mouse WHERE mouse_id = %s", (self.mouse_id,))
+            a_cursor.execute("DELETE FROM trials WHERE trial_id = %s", (self.trial_id,))
 
         if testing:
             with TestingCursor(postgresql) as cursor:

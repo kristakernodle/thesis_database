@@ -107,4 +107,3 @@ class BlindTrial:
         else:
             with Cursor() as cursor:
                 delete_from_db_main(cursor)
-

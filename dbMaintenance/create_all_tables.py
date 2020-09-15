@@ -1,3 +1,6 @@
+from dbMaintenance.tools.database import Database
+from dbMaintenance.tools.cursors import Cursor
+
 
 # MOUSE TABLE
 def create_mouse_table(a_cursor):
@@ -94,3 +97,25 @@ def create_blind_trials_table(a_cursor):
                      "folder_id  uuid references folders not null,"
                      "full_path varchar(255) not null);")
     a_cursor.execute("create unique index blind_trials_full_path_uindex on blind_trials (full_path);")
+
+
+# CREATE ALL TABLES
+def create_all_tables_main(db_details, main_user):
+    Database.initialize(database=db_details['name'],
+                        host=db_details['host'],
+                        port=5432,
+                        user=main_user['user'],
+                        password=main_user['password'])
+    with Cursor() as cursor:
+        cursor.execute("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
+        create_mouse_table(cursor)
+        create_experiments_table(cursor)
+        create_participant_details_table(cursor)
+        create_sessions_table(cursor)
+        create_folders_table(cursor)
+        create_trials_table(cursor)
+        create_reviewers_table(cursor)
+        create_blind_folders_table(cursor)
+        create_blind_trials_table(cursor)
+
+

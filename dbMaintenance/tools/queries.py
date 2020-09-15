@@ -3,7 +3,7 @@ import utilities as util
 
 def list_all_mouse_eartags(cursor):
     cursor.execute("SELECT eartag FROM mouse;")
-    return list(item for tup in cursor.fetchall() for item in tup)
+    return util.list_from_cursor(cursor.fetchall())
 
 
 def list_all_experiments(cursor):
@@ -16,14 +16,14 @@ def list_all_experiment_ids(cursor):
     return util.list_from_cursor(cursor.fetchall())
 
 
-def list_all_scored_dirs(cursor):
-    cursor.execute("SELECT scored_dir FROM reviewers;")
-    return list(item for tup in cursor.fetchall() for item in tup)
-
-
 def list_all_reviewer_ids(cursor):
     cursor.execute("SELECT reviewer_id FROM reviewers;")
-    return list(item for tup in cursor.fetchall() for item in tup)
+    return util.list_from_cursor(cursor.fetchall())
+
+
+def list_all_scored_dirs(cursor):
+    cursor.execute("SELECT scored_dir FROM reviewers;")
+    return util.list_from_cursor(cursor.fetchall())
 
 
 def list_all_detail_ids(cursor):
@@ -31,23 +31,27 @@ def list_all_detail_ids(cursor):
     return util.list_from_cursor(cursor.fetchall())
 
 
+def list_all_session_dir(cursor):
+    cursor.execute("SELECT session_dir FROM sessions;")
+    return util.list_from_cursor(cursor.fetchall())
+
+
 def list_all_folder_dir(cursor):
     cursor.execute("SELECT folder_dir FROM folders;")
-    return list(item for tup in cursor.fetchall() for item in tup)
+    return util.list_from_cursor(cursor.fetchall())
 
 
 def list_all_trial_dirs(cursor):
     cursor.execute("SELECT trial_dir FROM trials;")
-    return list(item for tup in cursor.fetchall() for item in tup)
+    return util.list_from_cursor(cursor.fetchall())
 
 
 def list_all_blind_names(cursor):
     cursor.execute("SELECT blind_name FROM blind_folders;")
-    return list(item for tup in cursor.fetchall() for item in tup)
+    return util.list_from_cursor(cursor.fetchall())
 
 
-# @classmethod
-# def list_all_blind_folders(cls, experiment_id, testing=False, postgresql=None):
+# def list_all_blind_folders(experiment_id, testing=False, postgresql=None):
 #
 #     def main_list_all_blind_folders(a_cursor):
 #         a_cursor.execute("SELECT blind_folder_id FROM blind_folders_all_upstream_ids WHERE experiment_id = %s",
@@ -168,8 +172,3 @@ def list_all_blind_names(cursor):
 #     else:
 #         with Cursor() as cursor:
 #             return list_participants_main(cursor, experiment_id)
-
-
-def list_all_session_dir(cursor):
-    cursor.execute("SELECT session_dir FROM sessions;")
-    return list(item for tup in cursor.fetchall() for item in tup)

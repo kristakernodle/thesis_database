@@ -41,8 +41,8 @@ class BlindFolder:
             if blind_folder_data is None:
                 print(f"No BlindFolder in the database with identifier.")
                 return None
-            return cls(folder_id=blind_folder_data[1], reviewer_id=blind_folder_data[2], blind_name=blind_folder_data[3],
-                       blind_folder_id=blind_folder_data[0])
+            return cls(folder_id=blind_folder_data[1], reviewer_id=blind_folder_data[2],
+                       blind_name=blind_folder_data[3], blind_folder_id=blind_folder_data[0])
 
         if testing:
             with TestingCursor(postgresql) as cursor:

@@ -25,11 +25,11 @@ class Experiment:
 
         def by_experiment_name(a_cursor, exp_name):
             a_cursor.execute("SELECT * FROM experiments WHERE experiment_name = %s;", (exp_name,))
-            return cursor.fetchone()
+            return a_cursor.fetchone()
 
         def by_id(a_cursor, exp_id):
             a_cursor.execute("SELECT * FROM experiments WHERE experiment_id = %s;", (exp_id,))
-            return cursor.fetchone()
+            return a_cursor.fetchone()
 
         def from_db_main(a_cursor, exp_name, exp_id):
             if exp_name is not None:

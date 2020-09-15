@@ -1,10 +1,11 @@
-from dbMaintenance.tools.database import Database
-from dbMaintenance.tools.cursors import Cursor
-import yaml
 from pathlib import Path
+
 import psycopg2
+import yaml
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from dbMaintenance import create_all_tables, create_all_views
+
+import dbMaintenance.create_all_tables
+import dbMaintenance.create_all_views
 
 
 def read_config(yaml_full_path):
@@ -20,41 +21,6 @@ def write_config(db_details, super_user, main_user, yaml_full_path):
             }
     with open(yaml_full_path, 'w+') as f:
         yaml.dump(data, f)
-
-
-# CREATE ALL TABLES
-def create_tables(db_details, main_user):
-    Database.initialize(database=db_details['name'],
-                        host=db_details['host'],
-                        port=5432,
-                        user=main_user['user'],
-                        password=main_user['password'])
-    with Cursor() as cursor:
-        cursor.execute("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";")
-        create_all_tables.create_mouse_table(cursor)
-        create_all_tables.create_experiments_table(cursor)
-        create_all_tables.create_participant_details_table(cursor)
-        create_all_tables.create_sessions_table(cursor)
-        create_all_tables.create_folders_table(cursor)
-        create_all_tables.create_trials_table(cursor)
-        create_all_tables.create_reviewers_table(cursor)
-        create_all_tables.create_blind_folders_table(cursor)
-        create_all_tables.create_blind_trials_table(cursor)
-
-
-# CREATE ALL VIEWS
-def create_views(db_details, main_user):
-    Database.initialize(database=db_details['name'],
-                        host=db_details['host'],
-                        port=5432,
-                        user=main_user['user'],
-                        password=main_user['password'])
-    with Cursor() as cursor:
-        create_all_views.create_view_all_participants_all_experiments(cursor)
-        create_all_views.create_view_folders_all_upstream_ids(cursor)
-        create_all_views.create_view_trials_all_upstream_ids(cursor)
-        create_all_views.create_view_blind_folders_all_upstream_ids(cursor)
-        create_all_views.create_view_blind_trials_all_upstream_ids(cursor)
 
 
 if __name__ == '__main__':
@@ -76,7 +42,8 @@ if __name__ == '__main__':
         superUser['password'] = input('Super user password: ')
         mainUser['user'] = input('Main user: ')
         mainUser['password'] = input('Main user password: ')
-        write_config(dbDetails, superUser, mainUser, Path.cwd().joinpath('dbConfig').joinpath(f'{dbName}_database_config.yaml'))
+        write_config(dbDetails, superUser, mainUser,
+                     Path.cwd().joinpath('dbConfig').joinpath(f'{dbName}_database_config.yaml'))
 
     # Connect to PostgreSQL DBMS
     con = psycopg2.connect(**superUser)
@@ -100,16 +67,9 @@ if __name__ == '__main__':
         con.close()
 
         # Create the tables and views as the mainUser
-        create_tables(dbDetails, mainUser)
-        create_views(dbDetails, mainUser)
+        dbMaintenance.create_all_tables.create_all_tables_main(dbDetails, mainUser)
+        dbMaintenance.create_all_views.create_views_main(dbDetails, mainUser)
 
     else:
         print("Database already exists!")
         con.close()
-
-
-
-
-
-
-

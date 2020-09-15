@@ -29,11 +29,11 @@ class Mouse:
 
         def by_eartag(a_cursor, a_eartag):
             a_cursor.execute("SELECT * FROM mouse WHERE eartag = %s;", (a_eartag,))
-            return cursor.fetchone()
+            return a_cursor.fetchone()
 
         def by_id(a_cursor, a_mouse_id):
             a_cursor.execute("SELECT * FROM mouse WHERE mouse_id = %s;", (a_mouse_id,))
-            return cursor.fetchone()
+            return a_cursor.fetchone()
 
         def from_db_main(a_cursor, a_eartag, a_mouse_id):
             if eartag is not None:

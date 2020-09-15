@@ -1,5 +1,6 @@
 from dbMaintenance.tools.cursors import Cursor, TestingCursor
 
+# noinspection PyProtectedMember
 from psycopg2._json import Json
 
 import utilities as util

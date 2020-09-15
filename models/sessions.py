@@ -1,4 +1,4 @@
-from database.cursors import Cursor, TestingCursor
+from dbMaintenance.tools.cursors import Cursor, TestingCursor
 import utilities as util
 
 

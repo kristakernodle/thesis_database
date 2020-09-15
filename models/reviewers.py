@@ -2,10 +2,10 @@ from dbMaintenance.tools.cursors import Cursor, TestingCursor
 
 
 class Reviewer:
-    def __init__(self, first_name, last_name, toScore_dir, scored_dir, reviewer_id=None):
+    def __init__(self, first_name, last_name, to_score_dir, scored_dir, reviewer_id=None):
         self.first_name = first_name
         self.last_name = last_name
-        self.toScore_dir = toScore_dir
+        self.toScore_dir = to_score_dir
         self.scored_dir = scored_dir
         self.reviewer_id = reviewer_id
 
@@ -25,17 +25,17 @@ class Reviewer:
 
         def by_id(a_cursor, a_reviewer_id):
             a_cursor.execute("SELECT * FROM reviewers WHERE reviewer_id = %s;", (a_reviewer_id,))
-            return cursor.fetchone()
+            return a_cursor.fetchone()
 
         def by_scored_dir(a_cursor, a_scored_dir):
             a_cursor.execute("SELECT * FROM reviewers WHERE scored_dir = %s;", (a_scored_dir,))
-            return cursor.fetchone()
+            return a_cursor.fetchone()
 
         def by_fullname(a_cursor, a_reviewer_fullname):
             a_reviewer_name = a_reviewer_fullname.split(' ')
-            cursor.execute("SELECT * FROM reviewers WHERE first_name = %s AND last_name = %s;",
-                           (a_reviewer_name[0], a_reviewer_name[1]))
-            return cursor.fetchone()
+            a_cursor.execute("SELECT * FROM reviewers WHERE first_name = %s AND last_name = %s;",
+                            (a_reviewer_name[0], a_reviewer_name[1]))
+            return a_cursor.fetchone()
 
         def from_db_main(a_reviewer_fullname, a_scored_dir, a_reviewer_id, a_cursor):
             if a_reviewer_id is not None:
@@ -50,7 +50,7 @@ class Reviewer:
             if reviewer_data is None:
                 print(f"No reviewer in the database with identifier.")
                 return None
-            return cls(first_name=reviewer_data[1], last_name=reviewer_data[2], toScore_dir=reviewer_data[3],
+            return cls(first_name=reviewer_data[1], last_name=reviewer_data[2], to_score_dir=reviewer_data[3],
                        scored_dir=reviewer_data[4], reviewer_id=reviewer_data[0])
 
         if testing:
