@@ -1,8 +1,7 @@
 from pathlib import Path
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-import dbMaintenance.create_all_tables
-import dbMaintenance.create_all_views
+import dbMaintenance
 from utilities import read_config, write_config
 
 
@@ -49,8 +48,8 @@ def setup_database(dbName):
         con.close()
 
         # Create the tables and views as the mainUser
-        dbMaintenance.create_all_tables.create_all_tables_main(dbDetails, mainUser)
-        dbMaintenance.create_all_views.create_views_main(dbDetails, mainUser)
+        dbMaintenance.create_all_tables(dbDetails, mainUser)
+        dbMaintenance.create_all_views(dbDetails, mainUser)
 
     else:
         print("Database already exists!")
