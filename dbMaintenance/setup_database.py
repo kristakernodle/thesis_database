@@ -11,11 +11,11 @@ def setup_database(dbName):
     # Get or generate the configuration settings for the database to access
     if dbConfig_path.exists():
         # Database config already exists
-        dbDetails, superUser, mainUser = read_config(dbConfig_path)
+        dbDetails, superUser, mainUser, blindReviewers = read_config(dbConfig_path)
     else:
         # Database config does not already exist, starting from default
         default_dbConfig_path = Path.cwd().joinpath('dbConfig').joinpath('default_database_config.yaml')
-        dbDetails, superUser, mainUser = read_config(default_dbConfig_path)
+        dbDetails, superUser, mainUser, blindReviewers = read_config(default_dbConfig_path)
 
         dbDetails['database'] = dbName
         dbDetails['host'] = input('Host (not sure? use localhost): ')
@@ -23,9 +23,9 @@ def setup_database(dbName):
         superUser['password'] = input('Super user password: ')
         mainUser['user'] = input('Main user: ')
         mainUser['password'] = input('Main user password: ')
-        write_config(dbDetails, superUser, mainUser,
+        write_config(dbDetails, superUser, mainUser, blindReviewers,
                      Path.cwd().joinpath('dbConfig').joinpath(f'{dbName}_database_config.yaml'))
-
+        print('Please update the configuration file with the blind reviewers for the project.')
     # Connect to PostgreSQL DBMS
     con = psycopg2.connect(**superUser)
     con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)

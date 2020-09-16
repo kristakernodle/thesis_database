@@ -93,16 +93,18 @@ def list_from_cursor(cursor_fetch):
 #         contents = list(csv.reader(f))
 #     return contents
 
+
 def read_config(yaml_full_path):
     with open(yaml_full_path) as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
-    return data['dbDetails'], data['superUser'], data['mainUser']
+    return data['dbDetails'], data['superUser'], data['mainUser'], data['blindReviewers']
 
 
-def write_config(db_details, super_user, main_user, yaml_full_path):
+def write_config(db_details, super_user, main_user, blind_reviewers, yaml_full_path):
     data = {'dbDetails': db_details,
             'superUser': super_user,
-            'mainUser': main_user
+            'mainUser': main_user,
+            'blindReviewers': blind_reviewers
             }
     with open(yaml_full_path, 'w+') as f:
         yaml.dump(data, f)

@@ -11,3 +11,8 @@ mainUser:
   user: main
   password: password
 
+blindReviewers:
+  reviewer1:
+    name: 'first last'
+    to_score_dir: '/tmp/reviewer1/toScore_R1/'
+    scored_dir: '/tmp/reviewer1/scored_R1/'
