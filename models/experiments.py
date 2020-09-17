@@ -1,6 +1,6 @@
 from dbMaintenance.tools.cursors import TestingCursor, Cursor
 import utilities as util
-from dbMaintenance.tools.queries import list_all_experiments
+from dbMaintenance.tools.queries.select_queries import list_all_experiments
 
 
 class Experiment:
