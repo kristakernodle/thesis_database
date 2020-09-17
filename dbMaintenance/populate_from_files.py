@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 import utilities as util
 import models
+from .tools.database import Database
 
 
 def read_back_up_csv(full_path):
@@ -150,7 +151,7 @@ def populate_blind_trials(back_up_folders_full_path, back_up_trials_full_path, b
         models.BlindTrial(trial.trial_id, folder.folder_id, full_path).save_to_db()
 
 
-def populate_db_from_back_up_csv(dir_all_back_up_csv):
+def populate_db_from_back_up_csv(db_details, main_user):
     all_tables = ['reviewers',
                   'mouse',
                   'experiments',
@@ -160,6 +161,7 @@ def populate_db_from_back_up_csv(dir_all_back_up_csv):
                   'trials',
                   'blind_folders',
                   'blind_trials']
+    dir_all_back_up_csv = db_details["backupDir"]
     path_all_back_up_csv = Path(dir_all_back_up_csv)
     if not all([path_all_back_up_csv.joinpath(table+'.csv').exists() for table in all_tables]):
         print('Some back up files do not exist')
@@ -171,6 +173,12 @@ def populate_db_from_back_up_csv(dir_all_back_up_csv):
     sessions_csv = path_all_back_up_csv.joinpath('sessions.csv')
     folders_csv = path_all_back_up_csv.joinpath('folders.csv')
     trials_csv = path_all_back_up_csv.joinpath('trials.csv')
+
+    Database.initialize(database=db_details['database'],
+                        host=db_details['host'],
+                        port=5432,
+                        user=main_user['user'],
+                        password=main_user['password'])
 
     populate_reviewers(reviewer_csv)
     populate_experiments(experiments_csv)

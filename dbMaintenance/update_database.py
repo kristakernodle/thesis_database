@@ -1,8 +1,9 @@
 from pathlib import Path
 import models
+from dbMaintenance import tools
 
 
-def update_from_data_dirs(experiment):
+def update_experiment_from_data_dirs(experiment):
     if not Path(experiment.experiment_dir).exists():
         print(f'Experiment directory, {experiment.experiment_dir}, does not exist.')
 
@@ -57,3 +58,16 @@ def update_from_data_dirs(experiment):
                                  folder.folder_id,
                                  str(trial_dir),
                                  session.session_date).save_to_db()
+
+
+def update_from_data_dirs(db_details, main_user):
+    tools.Database.initialize(database=db_details['database'],
+                              host=db_details['host'],
+                              port=5432,
+                              user=main_user['user'],
+                              password=main_user['password'])
+    with tools.Cursor() as cursor:
+        all_experiment_names = tools.list_all_experiments(cursor)
+
+    for experiment_name in all_experiment_names:
+        update_experiment_from_data_dirs(experiment_name)

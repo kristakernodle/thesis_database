@@ -2,6 +2,7 @@ from pathlib import Path
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import dbMaintenance
+from dbMaintenance import tools
 from utilities import read_config, write_config
 
 
@@ -11,11 +12,11 @@ def setup_database(dbName):
     # Get or generate the configuration settings for the database to access
     if dbConfig_path.exists():
         # Database config already exists
-        dbDetails, superUser, mainUser, blindReviewers = read_config(dbConfig_path)
+        dbDetails, superUser, mainUser, reviewers = read_config(dbConfig_path)
     else:
         # Database config does not already exist, starting from default
         default_dbConfig_path = Path.cwd().joinpath('dbConfig').joinpath('default_database_config.yaml')
-        dbDetails, superUser, mainUser, blindReviewers = read_config(default_dbConfig_path)
+        dbDetails, superUser, mainUser, reviewers = read_config(default_dbConfig_path)
 
         dbDetails['database'] = dbName
         dbDetails['host'] = input('Host (not sure? use localhost): ')
@@ -23,7 +24,7 @@ def setup_database(dbName):
         superUser['password'] = input('Super user password: ')
         mainUser['user'] = input('Main user: ')
         mainUser['password'] = input('Main user password: ')
-        write_config(dbDetails, superUser, mainUser, blindReviewers,
+        write_config(dbDetails, superUser, mainUser, reviewers,
                      Path.cwd().joinpath('dbConfig').joinpath(f'{dbName}_database_config.yaml'))
         print('Please update the configuration file with the blind reviewers for the project.')
     # Connect to PostgreSQL DBMS
@@ -37,12 +38,8 @@ def setup_database(dbName):
     if not databaseExists:
 
         createDatabase_command = f"CREATE DATABASE {dbDetails['database']};"
-        # createUser_command = f"CREATE USER {mainUser['user']} WITH ENCRYPTED PASSWORD '{mainUser['password']}';"
-        # grantPrivileges_command = f"GRANT ALL PRIVILEGES ON DATABASE {dbDetails['database']} TO {mainUser['user']};"
 
         cursor.execute(createDatabase_command)
-        # cursor.execute(createUser_command)
-        # cursor.execute(grantPrivileges_command)
 
         # Close this connection to the database
         con.close()
@@ -50,6 +47,12 @@ def setup_database(dbName):
         # Create the tables and views as the mainUser
         dbMaintenance.create_all_tables(dbDetails, mainUser)
         dbMaintenance.create_all_views(dbDetails, mainUser)
+
+        # Populate from csv back up files
+        dbMaintenance.populate_db_from_back_up_csv(dbDetails, mainUser)
+
+        # Updated from data directories
+        dbMaintenance.update_from_data_dirs(dbDetails, mainUser)
 
     else:
         print("Database already exists!")
