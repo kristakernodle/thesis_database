@@ -1,6 +1,16 @@
+import os
+import csv
 
-def populate_mouse():
-    pass
+
+def read_back_up_csv(fullpath):
+    with open(fullpath) as f:
+        csv_reader = csv.reader(f)
+        next(csv_reader)
+        return list(csv_reader)
+
+
+def populate_mouse(back_up_mouse_full_path):
+    all_mice = read_back_up_csv()
 
 
 def populate_experiments():
@@ -8,6 +18,7 @@ def populate_experiments():
 
 
 def populate_reviewers():
+
     pass
 
 

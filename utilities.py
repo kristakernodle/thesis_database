@@ -84,15 +84,6 @@ def list_from_cursor(cursor_fetch):
 
     return list(item for tup in cursor_fetch for item in tup)
 
-#
-# def read_table_csv_to_list(backup_folder_path, table_name):
-#     """Converts csv file to a list containing all the information"""
-#     table_filename = table_name + '.csv'
-#     table_dir = os.path.join(backup_folder_path, table_filename)
-#     with open(table_dir) as f:
-#         contents = list(csv.reader(f))
-#     return contents
-
 
 def read_config(yaml_full_path):
     with open(yaml_full_path) as f:
