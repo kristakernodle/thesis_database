@@ -20,7 +20,13 @@ class BlindFolder:
                     self.blind_folder_id == compare_to.blind_folder_id])
 
     @classmethod
-    def from_db(cls, blind_name=None, blind_folder_id=None, testing=False, postgresql=None):
+    def from_db(cls, blind_name=None, blind_folder_id=None, reviewer_id=None, folder_id=None, testing=False,
+                postgresql=None):
+
+        def by_reviewer_folder(a_cursor, a_reviewer_id, a_folder_id):
+            a_cursor.execute("SELECT * FROM blind_folders WHERE reviewer_id = %s AND folder_id = %s;",
+                             (a_reviewer_id, a_folder_id))
+            return a_cursor.fetchone()
 
         def by_blind_name(a_cursor, a_blind_name):
             a_cursor.execute("SELECT * FROM blind_folders WHERE blind_name = %s;", (a_blind_name,))
@@ -30,11 +36,13 @@ class BlindFolder:
             a_cursor.execute("SELECT * FROM blind_folders WHERE blind_folder_id = %s;", (a_blind_folder_id,))
             return a_cursor.fetchone()
 
-        def from_db_main(a_cursor, a_blind_name, a_blind_folder_id):
+        def from_db_main(a_cursor, a_blind_name, a_blind_folder_id, a_reviewer_id, a_folder_id):
             if a_blind_folder_id is not None:
                 blind_folder_data = by_id(a_cursor, a_blind_folder_id)
             elif a_blind_name is not None:
                 blind_folder_data = by_blind_name(a_cursor, a_blind_name)
+            elif a_reviewer_id is not None and a_cursor is not None:
+                blind_folder_data = by_reviewer_folder(a_cursor, a_reviewer_id, a_folder_id)
             else:
                 blind_folder_data = None
 
@@ -46,10 +54,10 @@ class BlindFolder:
 
         if testing:
             with TestingCursor(postgresql) as cursor:
-                return from_db_main(cursor, blind_name, blind_folder_id)
+                return from_db_main(cursor, blind_name, blind_folder_id, reviewer_id, folder_id)
         else:
             with Cursor() as cursor:
-                return from_db_main(cursor, blind_name, blind_folder_id)
+                return from_db_main(cursor, blind_name, blind_folder_id, reviewer_id, folder_id)
 
     def save_to_db(self, testing=False, postgresql=None):
 

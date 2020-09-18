@@ -54,6 +54,12 @@ def list_trial_ids_for_folder(cursor, folder_id):
     return util.list_from_cursor(cursor.fetchall())
 
 
+def list_blind_folder_id(cursor, reviewer_id, folder_id):
+    cursor.execute("SELECT blind_folder_id from blind_folders WHERE reviewer_id = %s AND folder_id = %s;",
+                   (reviewer_id, folder_id))
+    return util.list_from_cursor(cursor.fetchall())
+
+
 def list_all_reviewer_scored_dirs(cursor):
     cursor.execute("SELECT scored_dir FROM reviewers;")
     return util.list_from_cursor(cursor.fetchall())
