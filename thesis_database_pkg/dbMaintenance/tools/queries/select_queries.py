@@ -1,4 +1,4 @@
-import utilities as util
+from thesis_database_pkg import utilities as util
 
 
 def list_all_mouse_eartags(cursor):

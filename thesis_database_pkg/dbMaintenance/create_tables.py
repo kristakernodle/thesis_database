@@ -1,5 +1,5 @@
-from dbMaintenance.tools.database import Database
-from dbMaintenance.tools.cursors import Cursor
+from thesis_database_pkg.dbMaintenance.tools import Database
+from thesis_database_pkg.dbMaintenance.tools import Cursor
 
 
 # MOUSE TABLE

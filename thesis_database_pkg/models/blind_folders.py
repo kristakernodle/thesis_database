@@ -1,4 +1,4 @@
-from dbMaintenance.tools.cursors import Cursor, TestingCursor
+from thesis_database_pkg.dbMaintenance.tools import Cursor, TestingCursor
 
 
 class BlindFolder:

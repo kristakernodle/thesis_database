@@ -1,4 +1,4 @@
-import dbMaintenance.tools as tools
+import thesis_database_pkg.dbMaintenance.tools as tools
 import shutil
 from pathlib import Path
 

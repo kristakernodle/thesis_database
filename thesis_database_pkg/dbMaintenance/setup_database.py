@@ -1,9 +1,8 @@
 from pathlib import Path
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-import dbMaintenance
-from dbMaintenance import tools
-from utilities import read_config, write_config
+from thesis_database_pkg import dbMaintenance
+from thesis_database_pkg.utilities import read_config, write_config
 
 
 def setup_database(dbName):

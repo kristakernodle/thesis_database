@@ -1,4 +1,4 @@
-from dbMaintenance.tools.database import Database
+from thesis_database_pkg.dbMaintenance.tools import Database
 import psycopg2
 
 

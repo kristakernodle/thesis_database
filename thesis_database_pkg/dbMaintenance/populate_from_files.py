@@ -1,7 +1,6 @@
 import csv
 from pathlib import Path
-import utilities as util
-import models
+from .. import utilities as util, models
 from .tools.database import Database
 
 

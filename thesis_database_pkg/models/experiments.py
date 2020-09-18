@@ -1,6 +1,6 @@
-from dbMaintenance.tools.cursors import TestingCursor, Cursor
-import utilities as util
-from dbMaintenance.tools.queries.select_queries import list_all_experiments
+from thesis_database_pkg.dbMaintenance.tools import TestingCursor, Cursor
+from thesis_database_pkg import utilities as util
+from thesis_database_pkg.dbMaintenance.tools import list_all_experiments
 
 
 class Experiment:
