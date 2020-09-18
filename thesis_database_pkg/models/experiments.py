@@ -1,6 +1,6 @@
 from thesis_database_pkg.dbMaintenance.tools import TestingCursor, Cursor
 from thesis_database_pkg import utilities as util
-from thesis_database_pkg.dbMaintenance.tools import list_all_experiments
+from thesis_database_pkg.dbMaintenance.tools import list_all_experiment_names
 
 
 class Experiment:
@@ -65,7 +65,7 @@ class Experiment:
                 (self.experiment_name, self.experiment_dir, self.experiment_id))
 
         def save_to_db_main(a_cursor):
-            if self.experiment_name not in list_all_experiments(a_cursor):
+            if self.experiment_name not in list_all_experiment_names(a_cursor):
                 insert_into_db(a_cursor)
                 return self.from_db(experiment_name=self.experiment_name)
             else:

@@ -67,7 +67,7 @@ def update_from_data_dirs(db_details, main_user):
                               user=main_user['user'],
                               password=main_user['password'])
     with tools.Cursor() as cursor:
-        all_experiment_names = tools.list_all_experiments(cursor)
+        all_experiment_names = tools.list_all_experiment_names(cursor)
 
     for experiment_name in all_experiment_names:
         update_experiment_from_data_dirs(experiment_name)
