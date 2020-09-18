@@ -7,7 +7,7 @@ class Cursor:
         self.connection = None
         self.cursor = None
 
-    def __enter__(self):
+    def __enter_g_(self):
         # Executed when we enter the 'with' statement
         self.connection = Database.get_connection()
         self.cursor = self.connection.cursor()
