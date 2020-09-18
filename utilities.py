@@ -1,20 +1,7 @@
 import datetime
-import random
 import re
-import string
 
 import yaml
-
-
-def random_string_generator(len_string=10):
-    """Generates a random string of length len_string.
-    String will contain only lowercase letters and digits.
-    :param len_string: length of returned string (default 10)
-    :return : string of length len_string
-    """
-
-    lowercase_letters_and_digits = list(string.ascii_lowercase + string.digits)
-    return ''.join(random.choices(lowercase_letters_and_digits, weights=None, k=len_string))
 
 
 def convert_date_int_yyyymmdd(int_yyyymmdd):
@@ -88,14 +75,14 @@ def list_from_cursor(cursor_fetch):
 def read_config(yaml_full_path):
     with open(yaml_full_path) as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
-    return data['dbDetails'], data['superUser'], data['mainUser'], data['blindReviewers']
+    return data['dbDetails'], data['superUser'], data['mainUser'], data['reviewers']
 
 
 def write_config(db_details, super_user, main_user, blind_reviewers, yaml_full_path):
     data = {'dbDetails': db_details,
             'superUser': super_user,
             'mainUser': main_user,
-            'blindReviewers': blind_reviewers
+            'reviewers': blind_reviewers
             }
     with open(yaml_full_path, 'w+') as f:
         yaml.dump(data, f)

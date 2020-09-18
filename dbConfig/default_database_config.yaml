@@ -1,7 +1,7 @@
 dbDetails:
   database: default_name
   host: localhost
-  backupDir: /tmp/dbBackUp
+  backupDir: '/tmp/dbBackUp'
 
 superUser:
   user: postgres
