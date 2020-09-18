@@ -49,6 +49,12 @@ def list_all_folder_ids_for_experiment(cursor, experiment_id):
     return util.list_from_cursor(cursor.fetchall())
 
 
+def list_all_folder_ids_for_blind_folders_of_experiment(cursor, experiment_id):
+    cursor.execute("SELECT folder_id FROM blind_folders_all_upstream_ids WHERE experiment_id = %s;",
+                   (experiment_id,))
+    return util.list_from_cursor(cursor.fetchall())
+
+
 def list_trial_ids_for_folder(cursor, folder_id):
     cursor.execute("SELECT trial_id FROM trials WHERE folder_id = %s;", (folder_id,))
     return util.list_from_cursor(cursor.fetchall())

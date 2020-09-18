@@ -3,10 +3,11 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from thesis_database_pkg import dbMaintenance
 from thesis_database_pkg.utilities import read_config, write_config
+import thesis_database_pkg
 
 
 def setup_database(dbName):
-    dbConfig_path = Path.cwd().joinpath('dbConfig').joinpath(f'{dbName}_database_config.yaml')
+    dbConfig_path = Path(thesis_database_pkg.__file__).joinpath('dbConfig').joinpath(f'{dbName}_database_config.yaml')
 
     # Get or generate the configuration settings for the database to access
     if dbConfig_path.exists():

@@ -1,6 +1,5 @@
 from pathlib import Path
-from thesis_database_pkg import models
-from thesis_database_pkg.dbMaintenance import tools
+from thesis_database_pkg import models, tools
 
 
 def update_experiment_from_data_dirs(experiment):

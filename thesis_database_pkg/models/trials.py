@@ -1,5 +1,5 @@
 from thesis_database_pkg import utilities as util
-from thesis_database_pkg.dbMaintenance.tools import Cursor, TestingCursor
+from thesis_database_pkg.tools import Cursor, TestingCursor
 
 
 class Trial:
