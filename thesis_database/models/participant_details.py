@@ -1,11 +1,11 @@
-from thesis_database_pkg.tools import Cursor, TestingCursor
+from thesis_database.tools import Cursor, TestingCursor
 
 # noinspection PyProtectedMember
 from psycopg2._json import Json
 
-from thesis_database_pkg import utilities as util
-from thesis_database_pkg.models import Mouse
-from thesis_database_pkg.models.experiments import Experiment
+from thesis_database import utilities as util
+from thesis_database.models import Mouse
+from thesis_database.models.experiments import Experiment
 
 
 class ParticipantDetails:

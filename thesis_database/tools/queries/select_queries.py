@@ -1,4 +1,4 @@
-from thesis_database_pkg import utilities as util
+from thesis_database import utilities as util
 
 
 def list_all_experiment_names(cursor):
@@ -87,6 +87,22 @@ def list_all_trial_dirs(cursor):
 
 
 def list_all_session_dirs_for_mouse(cursor, mouse_id, experiment_id):
-    cursor.execute("SELECT session_dir FROM sessions WHERE mouse_id = %s AND experiment_id = %s",
+    cursor.execute("SELECT session_dir FROM sessions WHERE mouse_id = %s AND experiment_id = %s;",
                    (mouse_id, experiment_id))
+    return util.list_from_cursor(cursor.fetchall())
+
+
+def list_all_folder_dirs_for_experiment(cursor, experiment_id):
+    cursor.execute("SELECT folder_dir "
+                   "FROM folders "
+                   "    JOIN folders_all_upstream_ids "
+                   "        ON folders.folder_id = folders_all_upstream_ids.folder_id "
+                   "WHERE experiment_id=%s;",
+                   (experiment_id,))
+    return util.list_from_cursor(cursor.fetchall())
+
+
+def list_all_trial_dirs_for_experiment(cursor, experiment_id):
+    cursor.execute("SELECT trial_dir FROM trials WHERE experiment_id=%s;",
+                   (experiment_id,))
     return util.list_from_cursor(cursor.fetchall())

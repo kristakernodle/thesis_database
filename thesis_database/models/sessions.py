@@ -1,5 +1,5 @@
-from thesis_database_pkg.tools import Cursor, TestingCursor
-from thesis_database_pkg import utilities as util
+from thesis_database.tools import Cursor, TestingCursor
+from thesis_database import utilities as util
 
 
 class Session:
@@ -67,14 +67,16 @@ class Session:
                              (self.session_date, self.session_dir, self.session_id))
 
         def save_to_db_main(a_cursor):
-            if self.from_db(session_id=self.session_id) is None and self.from_db(session_dir=self.session_dir) is None:
-                insert_into_db(a_cursor)
-                return self.from_db(session_id=self.session_id)
-            elif self == self.from_db(session_id=self.session_id):
+            return_session_id = self.from_db(session_id=self.session_id)
+            return_session_dir = self.from_db(session_dir=self.session_dir)
+            if self == return_session_id:
                 return self
+            elif return_session_id is None and return_session_dir is None:
+                insert_into_db(a_cursor)
+                return self.from_db(session_dir=self.session_dir)
             else:
                 update_db_entry(a_cursor)
-                return self.from_db(session_id=self.session_id)
+                return self.from_db(session_dir=self.session_dir)
 
         if testing:
             with TestingCursor(postgresql) as cursor:

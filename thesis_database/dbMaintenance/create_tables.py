@@ -1,5 +1,5 @@
-from thesis_database_pkg.tools import Database
-from thesis_database_pkg.tools import Cursor
+from thesis_database.tools import Database
+from thesis_database.tools import Cursor
 
 
 # MOUSE TABLE

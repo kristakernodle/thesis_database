@@ -1,5 +1,5 @@
-from thesis_database_pkg.tools import Cursor, TestingCursor
-from thesis_database_pkg import utilities as util
+from thesis_database.tools import Cursor, TestingCursor
+from thesis_database import utilities as util
 
 
 class Mouse:

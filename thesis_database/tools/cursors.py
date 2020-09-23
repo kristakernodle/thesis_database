@@ -1,4 +1,4 @@
-from thesis_database_pkg.tools import Database
+from thesis_database.tools import Database
 import psycopg2
 
 

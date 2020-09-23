@@ -1,6 +1,6 @@
-from thesis_database_pkg.tools import TestingCursor, Cursor
-from thesis_database_pkg import utilities as util
-from thesis_database_pkg.tools import list_all_experiment_names
+from thesis_database.tools import TestingCursor, Cursor
+from thesis_database import utilities as util
+from thesis_database.tools import list_all_experiment_names
 
 
 class Experiment:

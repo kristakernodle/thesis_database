@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 from .. import utilities as util, models
-from thesis_database_pkg.tools import Database
+from thesis_database.tools import Database
 
 
 def read_back_up_csv(full_path):

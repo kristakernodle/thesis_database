@@ -1,13 +1,13 @@
 from pathlib import Path
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-from thesis_database_pkg import dbMaintenance
-from thesis_database_pkg.utilities import read_config, write_config
-import thesis_database_pkg
+from thesis_database import dbMaintenance
+from thesis_database.utilities import read_config, write_config
+import thesis_database
 
 
 def setup_database(dbName):
-    dbConfig_path = Path('/Users/Krista/Documents/GitHub/thesis_database/thesis_database_pkg/dbConfig').joinpath(
+    dbConfig_path = Path('/thesis_database/dbConfig').joinpath(
         f'{dbName}_database_config.yaml')
     # Get or generate the configuration settings for the database to access
     if dbConfig_path.exists():
@@ -15,7 +15,7 @@ def setup_database(dbName):
         dbDetails, superUser, mainUser, reviewers = read_config(dbConfig_path)
     else:
         # Database config does not already exist, starting from default
-        default_dbConfig_path = Path('/Users/Krista/Documents/GitHub/thesis_database/thesis_database_pkg/dbConfig'
+        default_dbConfig_path = Path('/thesis_database/dbConfig'
                                      ).joinpath('default_database_config.yaml')
         dbDetails, superUser, mainUser, reviewers = read_config(default_dbConfig_path)
 
