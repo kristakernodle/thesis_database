@@ -11,6 +11,9 @@ def update_experiment_from_data_dirs(experiment):
     for participant_dir in all_participant_dirs:
 
         eartag_num = int(participant_dir.name.strip('et'))
+        if eartag_num == 7014:
+            print('found the mouse')
+            print('')
         mouse = models.Mouse.from_db(eartag_num)
 
         if mouse is None:

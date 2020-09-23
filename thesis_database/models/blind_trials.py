@@ -62,13 +62,13 @@ class BlindTrial:
 
         def insert_into_db(a_cursor):
             a_cursor.execute("INSERT INTO blind_trials (trial_id, folder_id, full_path) VALUES (%s, %s, %s);",
-                             (self.trial_id, self.folder_id, self.full_path))
+                             (self.trial_id, self.folder_id, str(self.full_path)))
 
         def update_db_entry(a_cursor):
             a_cursor.execute("UPDATE blind_trials "
                              "SET (trial_id, folder_id, full_path) = (%s, %s, %s) "
                              "WHERE blind_trial_id = %s;",
-                             (self.trial_id, self.folder_id, self.full_path, self.blind_trial_id))
+                             (self.trial_id, self.folder_id, str(self.full_path), self.blind_trial_id))
 
         def save_to_db_main(a_cursor):
             return_blind_trial_id = self.from_db(blind_trial_id=self.blind_trial_id)

@@ -75,7 +75,7 @@ class BlindFolder:
             return_blind_folder_id = self.from_db(blind_folder_id=self.blind_folder_id)
             return_blind_name = self.from_db(blind_name=self.blind_name)
             if self == return_blind_folder_id:
-                return self
+                return self.from_db(blind_name=self.blind_name)
             elif return_blind_folder_id is None and return_blind_name is None:
                 insert_into_db(a_cursor)
                 return self.from_db(blind_name=self.blind_name)
