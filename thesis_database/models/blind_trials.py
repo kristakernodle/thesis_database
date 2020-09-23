@@ -37,6 +37,7 @@ class BlindTrial:
             return a_cursor.fetchone()
 
         def from_db_main(a_cursor, a_full_path, a_blind_trial_id, a_reviewer_id, a_trial_id):
+            a_full_path = str(a_full_path)
             if a_blind_trial_id is not None:
                 blind_trial_data = by_id(a_cursor, a_blind_trial_id)
             elif full_path is not None:
