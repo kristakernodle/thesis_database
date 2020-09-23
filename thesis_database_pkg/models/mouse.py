@@ -44,7 +44,6 @@ class Mouse:
                 mouse_data = None
 
             if mouse_data is None:
-                print(f"No mouse in the database with this identifier.")
                 return None
             return cls(eartag=mouse_data[1], birthdate=mouse_data[2],
                        genotype=util.decode_genotype(mouse_data[3]), sex=mouse_data[4], mouse_id=mouse_data[0])
@@ -72,19 +71,12 @@ class Mouse:
             if self.from_db(eartag=self.eartag) is None:
                 insert_into_db(a_cursor)
                 return self.from_db(eartag=self.eartag)
+            elif self == self.from_db(eartag=self.eartag):
+                return self
             else:
-                print('Mouse already in database.')
-                if self == self.from_db(eartag=self.eartag):
-                    return self
-                else:
-                    print('This mouse information is different from what is in the database.')
-                    update = input('Do you want to update this mouse? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(eartag=self.eartag)
-                    else:
-                        print('Mouse not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(eartag=self.eartag)
+
         if testing:
             with TestingCursor(postgresql) as cursor:
                 if self.from_db(eartag=self.eartag) is None:

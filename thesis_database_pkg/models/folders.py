@@ -37,7 +37,6 @@ class Folder:
                 folder_data = None
 
             if folder_data is None:
-                print(f"No folder in the database with identifier.")
                 return None
             return cls(session_id=folder_data[1], folder_dir=folder_data[2], folder_id=folder_data[0])
 
@@ -62,22 +61,17 @@ class Folder:
                              (self.session_id, self.folder_dir, self.folder_id))
 
         def save_to_db_main(a_cursor):
-            if self.from_db(folder_id=self.folder_id) is None:
+            return_folder_id = self.from_db(folder_id=self.folder_id)
+            return_folder_dir = self.from_db(folder_dir=self.folder_dir)
+            if self == return_folder_id:
+                return self
+            elif return_folder_id is None and return_folder_dir is None:
                 insert_into_db(a_cursor)
-                return self.from_db(folder_id=self.folder_id)
+                return self.from_db(folder_dir=self.folder_dir)
             else:
-                print('Folder already in database.')
-                if self == self.from_db(folder_id=self.folder_id):
-                    return self
-                else:
-                    print('This folder information is different from what is in the database.')
-                    update = input('Do you want to update this folder? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(folder_id=self.folder_id)
-                    else:
-                        print('Folder not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(folder_dir=self.folder_dir)
+
         if testing:
             with TestingCursor(postgresql) as cursor:
                 return save_to_db_main(cursor)

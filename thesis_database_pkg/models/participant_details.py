@@ -42,7 +42,6 @@ class ParticipantDetails:
                              (a_mouse.mouse_id, a_experiment.experiment_id))
             participant_details = cursor.fetchone()
             if participant_details is None:
-                print('No participant details for this mouse/experiment pair.')
                 return None
             return cls(mouse, experiment, participant_dir=participant_details[6], start_date=participant_details[3],
                        end_date=participant_details[4],
@@ -79,19 +78,11 @@ class ParticipantDetails:
             if self.from_db(self.mouse.eartag, self.experiment.experiment_name) is None:
                 insert_into_db(a_cursor)
                 return self.from_db(self.mouse.eartag, self.experiment.experiment_name)
+            elif self == self.from_db(self.mouse.eartag, self.experiment.experiment_name):
+                return self
             else:
-                print('Participant details for this mouse/experiment pair already in database.')
-                if self == self.from_db(self.mouse.eartag, self.experiment.experiment_name):
-                    return self
-                else:
-                    print('This participant detail information is different from what is in the database.')
-                    update = input('Do you want to update this participant detail? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(self.mouse.eartag, self.experiment.experiment_name)
-                    else:
-                        print('Participant details not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(self.mouse.eartag, self.experiment.experiment_name)
 
         if testing:
             with TestingCursor(postgresql) as cursor:

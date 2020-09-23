@@ -42,7 +42,6 @@ class Session:
                 session_data = None
 
             if session_data is None:
-                print(f"No session in the database with identifier.")
                 return None
             return cls(mouse_id=session_data[1], experiment_id=session_data[2], session_date=session_data[3],
                        session_dir=session_data[4], session_id=session_data[0])
@@ -68,22 +67,14 @@ class Session:
                              (self.session_date, self.session_dir, self.session_id))
 
         def save_to_db_main(a_cursor):
-            if self.from_db(session_id=self.session_id) is None:
+            if self.from_db(session_id=self.session_id) is None and self.from_db(session_dir=self.session_dir) is None:
                 insert_into_db(a_cursor)
                 return self.from_db(session_id=self.session_id)
+            elif self == self.from_db(session_id=self.session_id):
+                return self
             else:
-                print('Session already in database.')
-                if self == self.from_db(session_id=self.session_id):
-                    return self
-                else:
-                    print('This session information is different from what is in the database.')
-                    update = input('Do you want to update this session? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(session_id=self.session_id)
-                    else:
-                        print('Session not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(session_id=self.session_id)
 
         if testing:
             with TestingCursor(postgresql) as cursor:

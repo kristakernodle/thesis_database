@@ -7,15 +7,16 @@ import thesis_database_pkg
 
 
 def setup_database(dbName):
-    dbConfig_path = Path(thesis_database_pkg.__file__).joinpath('dbConfig').joinpath(f'{dbName}_database_config.yaml')
-
+    dbConfig_path = Path('/Users/Krista/Documents/GitHub/thesis_database/thesis_database_pkg/dbConfig').joinpath(
+        f'{dbName}_database_config.yaml')
     # Get or generate the configuration settings for the database to access
     if dbConfig_path.exists():
         # Database config already exists
         dbDetails, superUser, mainUser, reviewers = read_config(dbConfig_path)
     else:
         # Database config does not already exist, starting from default
-        default_dbConfig_path = Path.cwd().joinpath('dbConfig').joinpath('default_database_config.yaml')
+        default_dbConfig_path = Path('/Users/Krista/Documents/GitHub/thesis_database/thesis_database_pkg/dbConfig'
+                                     ).joinpath('default_database_config.yaml')
         dbDetails, superUser, mainUser, reviewers = read_config(default_dbConfig_path)
 
         dbDetails['database'] = dbName

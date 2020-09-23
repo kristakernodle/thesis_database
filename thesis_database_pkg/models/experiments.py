@@ -40,7 +40,6 @@ class Experiment:
                 exp = None
 
             if exp is None:
-                print(f"No experiment in the database with this identifier.")
                 return None
             return cls(experiment_name=exp[2], experiment_dir=exp[1],
                        experiment_id=exp[0])
@@ -68,19 +67,11 @@ class Experiment:
             if self.experiment_name not in list_all_experiment_names(a_cursor):
                 insert_into_db(a_cursor)
                 return self.from_db(experiment_name=self.experiment_name)
+            elif self == self.from_db(experiment_name=self.experiment_name):
+                return self
             else:
-                print('Experiment already in database.')
-                if self == self.from_db(experiment_name=self.experiment_name):
-                    return self
-                else:
-                    print('This experiment information is different from what is in the database.')
-                    update = input('Do you want to update this experiment? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(experiment_name=self.experiment_name)
-                    else:
-                        print('Experiment not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(experiment_name=self.experiment_name)
 
         if testing:
             with TestingCursor(postgresql) as cursor:

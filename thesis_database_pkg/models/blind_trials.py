@@ -47,7 +47,6 @@ class BlindTrial:
                 blind_trial_data = None
 
             if blind_trial_data is None:
-                print(f"No blind trial in the database with reviewer and trial id")
                 return None
             return cls(trial_id=blind_trial_data[1], folder_id=blind_trial_data[2],
                        full_path=blind_trial_data[3], blind_trial_id=blind_trial_data[0])
@@ -72,22 +71,16 @@ class BlindTrial:
                              (self.trial_id, self.folder_id, self.full_path, self.blind_trial_id))
 
         def save_to_db_main(a_cursor):
-            if self.from_db(blind_trial_id=self.blind_trial_id) is None:
+            return_blind_trial_id = self.from_db(blind_trial_id=self.blind_trial_id)
+            return_full_path = self.from_db(full_path=self.full_path)
+            if self == return_blind_trial_id:
+                return self
+            elif return_blind_trial_id is None and return_full_path is None:
                 insert_into_db(a_cursor)
-                return self.from_db(blind_trial_id=self.blind_trial_id)
+                return self.from_db(full_path=self.full_path)
             else:
-                print('Blind trial already in database.')
-                if self == self.from_db(blind_trial_id=self.blind_trial_id):
-                    return self
-                else:
-                    print('This blind trial information is different from what is in the database.')
-                    update = input('Do you want to update this blind trial? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(blind_trial_id=self.blind_trial_id)
-                    else:
-                        print('Blind trial not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(full_path=self.full_path)
 
         if testing:
             with TestingCursor(postgresql) as cursor:

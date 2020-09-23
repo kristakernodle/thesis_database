@@ -48,7 +48,6 @@ class Reviewer:
                 reviewer_data = None
 
             if reviewer_data is None:
-                print(f"No reviewer in the database with identifier.")
                 return None
             return cls(first_name=reviewer_data[1], last_name=reviewer_data[2], to_score_dir=reviewer_data[3],
                        scored_dir=reviewer_data[4], reviewer_id=reviewer_data[0])
@@ -69,7 +68,7 @@ class Reviewer:
 
         def update_db_entry(a_cursor):
             a_cursor.execute("UPDATE reviewers "
-                             "SET (first_name, last_name, toScore_dir, scored_dir) = (%s, %s, %s) "
+                             "SET (first_name, last_name, toScore_dir, scored_dir) = (%s, %s, %s, %s) "
                              "WHERE reviewer_id = %s;",
                              (self.first_name, self.last_name, self.toScore_dir, self.scored_dir, self.reviewer_id))
 
@@ -77,19 +76,11 @@ class Reviewer:
             if self.from_db(scored_dir=self.scored_dir) is None:
                 insert_into_db(a_cursor)
                 return self.from_db(scored_dir=self.scored_dir)
+            elif self == self.from_db(scored_dir=self.scored_dir):
+                return self
             else:
-                print('Reviewer already in database.')
-                if self == self.from_db(scored_dir=self.scored_dir):
-                    return self
-                else:
-                    print('This reviewer information is different from what is in the database.')
-                    update = input('Do you want to update this reviewer? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(scored_dir=self.scored_dir)
-                    else:
-                        print('Reviewer not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(scored_dir=self.scored_dir)
 
         if testing:
             with TestingCursor(postgresql) as cursor:

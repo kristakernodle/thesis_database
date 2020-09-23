@@ -69,4 +69,5 @@ def update_from_data_dirs(db_details, main_user):
         all_experiment_names = tools.list_all_experiment_names(cursor)
 
     for experiment_name in all_experiment_names:
-        update_experiment_from_data_dirs(experiment_name)
+        experiment = models.Experiment.from_db(experiment_name=experiment_name)
+        update_experiment_from_data_dirs(experiment)

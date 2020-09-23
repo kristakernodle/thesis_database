@@ -22,7 +22,7 @@ def get_experiment_from_old_id(experiment_id, back_up_experiments_full_path):
     all_experiments = read_back_up_csv(back_up_experiments_full_path)
     for experiment_data in all_experiments:
         if experiment_data[0] == experiment_id:
-            return models.Experiment.from_db(experiment_name=experiment_data[1])
+            return models.Experiment.from_db(experiment_name=experiment_data[2])
 
 
 def get_mouse_from_old_id(mouse_id, back_up_mouse_full_path):
@@ -105,8 +105,16 @@ def populate_participant_details(back_up_mouse_full_path, back_up_experiments_fu
         mouse = get_mouse_from_old_id(mouse_id, back_up_mouse_full_path)
         experiment = get_experiment_from_old_id(experiment_id, back_up_experiments_full_path)
         exp_spec_details = decode_exp_spec_details(''.join(participant_detail[5:-1]), experiment.experiment_name)
-        models.ParticipantDetails(mouse, experiment, participant_dir, int(''.join(start_date.split('-'))),
-                                  int(''.join(end_date.split('-'))), exp_spec_details).save_to_db()
+        if start_date is not None and start_date is not '':
+            start_date = int(''.join(start_date.split('-')))
+        else:
+            start_date = None
+        if end_date is not None and end_date is not '':
+            end_date = int(''.join(end_date.split('-')))
+        else:
+            end_date = None
+        models.ParticipantDetails(mouse, experiment, participant_dir, start_date,
+                                  end_date, exp_spec_details).save_to_db()
 
 
 def populate_sessions(back_up_mouse_full_path, back_up_experiments_full_path, back_up_sessions_full_path):
@@ -131,7 +139,7 @@ def populate_trials(back_up_experiments_full_path, back_up_folders_full_path, ba
         experiment = get_experiment_from_old_id(experiment_id, back_up_experiments_full_path)
         folder = get_folder_from_old_id(folder_id, back_up_folders_full_path)
         models.Trial(experiment.experiment_id, folder.folder_id, trial_dir,
-                     int(''.join(trial_data.split('-')))).save_to_db()
+                     int(''.join(trial_date.split('-')))).save_to_db()
 
 
 def populate_blind_folders(back_up_reviewers_full_path, back_up_folders_full_path, back_up_blind_folders_full_path):

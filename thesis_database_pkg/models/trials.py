@@ -42,7 +42,6 @@ class Trial:
                 trial_data = None
 
             if trial_data is None:
-                print(f"No trial in the database with directory {a_trial_id}")
                 return None
             return cls(experiment_id=trial_data[1], folder_id=trial_data[2], trial_dir=trial_data[3],
                        trial_date=trial_data[4], trial_id=trial_data[0])
@@ -69,22 +68,16 @@ class Trial:
                              (self.trial_dir, self.trial_date, self.trial_id))
 
         def save_to_db_main(a_cursor):
-            if self.from_db(trial_id=self.trial_id) is None:
+            return_trial_id = self.from_db(trial_id=self.trial_id)
+            return_trial_dir = self.from_db(trial_dir=self.trial_dir)
+            if self == return_trial_id:
+                return self
+            elif return_trial_id is None and return_trial_dir is None:
                 insert_into_db(a_cursor)
-                return self.from_db(trial_id=self.trial_id)
+                return self.from_db(trial_dir=self.trial_dir)
             else:
-                print('Trial already in database.')
-                if self == self.from_db(trial_id=self.trial_id):
-                    return self
-                else:
-                    print('This trial information is different from what is in the database.')
-                    update = input('Do you want to update this trial? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(trial_id=self.trial_id)
-                    else:
-                        print('Trial not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(trial_dir=self.trial_dir)
 
         if testing:
             with TestingCursor(postgresql) as cursor:

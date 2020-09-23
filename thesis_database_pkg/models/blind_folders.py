@@ -47,7 +47,6 @@ class BlindFolder:
                 blind_folder_data = None
 
             if blind_folder_data is None:
-                print(f"No BlindFolder in the database with identifier.")
                 return None
             return cls(folder_id=blind_folder_data[1], reviewer_id=blind_folder_data[2],
                        blind_name=blind_folder_data[3], blind_folder_id=blind_folder_data[0])
@@ -73,22 +72,16 @@ class BlindFolder:
                              (self.reviewer_id, self.blind_name, self.folder_id))
 
         def save_to_db_main(a_cursor):
-            if self.from_db(blind_folder_id=self.blind_folder_id) is None:
+            return_blind_folder_id = self.from_db(blind_folder_id=self.blind_folder_id)
+            return_blind_name = self.from_db(blind_name=self.blind_name)
+            if self == return_blind_folder_id:
+                return self
+            elif return_blind_folder_id is None and return_blind_name is None:
                 insert_into_db(a_cursor)
-                return self.from_db(blind_folder_id=self.blind_folder_id)
+                return self.from_db(blind_name=self.blind_name)
             else:
-                print('Blind folder already in database.')
-                if self == self.from_db(blind_folder_id=self.blind_folder_id):
-                    return self
-                else:
-                    print('This blind folder information is different from what is in the database.')
-                    update = input('Do you want to update this blind folder? [y/N]: ')
-                    if update.lower() in ['y', 'yes', '1']:
-                        update_db_entry(a_cursor)
-                        return self.from_db(blind_folder_id=self.blind_folder_id)
-                    else:
-                        print('Blind folder not updated')
-                        return self
+                update_db_entry(a_cursor)
+                return self.from_db(blind_name=self.blind_name)
 
         if testing:
             with TestingCursor(postgresql) as cursor:
