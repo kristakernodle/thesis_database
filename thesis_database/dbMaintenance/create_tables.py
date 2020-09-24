@@ -99,6 +99,18 @@ def create_blind_trials_table(a_cursor):
     a_cursor.execute("create unique index blind_trials_full_path_uindex on blind_trials (full_path);")
 
 
+# TRIAL SCORE TABLE
+def create_trial_score_table(a_cursor):
+    a_cursor.execute("CREATE TABLE trial_scores("
+                     "trial_score_id uuid default uuid_generate_v4() constraint trial_score_pkey primary key,"
+                     "trial_id uuid references trials not null,"
+                     "reviewer_id uuid references reviewers not null,"
+                     "trial_num smallint not null,"
+                     "reach_score smallint not null,"
+                     "abnormal_movt_score bool not null,"
+                     "grooming_score bool not null);")
+
+
 # CREATE ALL TABLES
 def create_all_tables_main(db_details, main_user):
     Database.initialize(database=db_details['database'],
@@ -117,5 +129,4 @@ def create_all_tables_main(db_details, main_user):
         create_reviewers_table(cursor)
         create_blind_folders_table(cursor)
         create_blind_trials_table(cursor)
-
-
+        create_trial_score_table(cursor)

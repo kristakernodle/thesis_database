@@ -61,6 +61,21 @@ def create_view_blind_trials_all_upstream_ids(a_cursor):
     """)
 
 
+def create_view_trial_scores_all_ids(a_cursor):
+    a_cursor.execute("""
+    CREATE VIEW trials_scores_all_ids 
+    (mouse_id, experiment_id, session_id, folder_id, trial_id, reviewer_id, blind_folder_id, blind_trial_id, trial_score_id) 
+    AS SELECT sessions.mouse_id, sessions.experiment_id, sessions.session_id, folders.folder_id, trials.trial_id, 
+        blind_folders.reviewer_id, blind_folders.folder_id, blind_trials.trial_id, trial_scores.trial_score_id
+    FROM blind_trials
+    JOIN trials on trials.trial_id = blind_trials.trial_id
+    JOIN folders ON folders.folder_id = trials.folder_id
+    JOIN sessions on sessions.session_id = folders.session_id
+    JOIN blind_folders on blind_folders.folder_id = folders.folder_id
+    JOIN trial_scores on trial_scores.trial_id = trials.trial_id;
+    """)
+
+
 # CREATE ALL VIEWS
 def create_views_main(db_details, main_user):
     Database.initialize(database=db_details['database'],
@@ -74,4 +89,4 @@ def create_views_main(db_details, main_user):
         create_view_trials_all_upstream_ids(cursor)
         create_view_blind_folders_all_upstream_ids(cursor)
         create_view_blind_trials_all_upstream_ids(cursor)
-
+        create_view_trial_scores_all_ids(cursor)
