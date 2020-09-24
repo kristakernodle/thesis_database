@@ -106,3 +106,13 @@ def list_all_trial_dirs_for_experiment(cursor, experiment_id):
     cursor.execute("SELECT trial_dir FROM trials WHERE experiment_id=%s;",
                    (experiment_id,))
     return util.list_from_cursor(cursor.fetchall())
+
+
+def list_all_blind_names_for_reviewer_experiment(cursor, reviewer_id, experiment_id):
+    cursor.execute("SELECT blind_name "
+                   "FROM blind_folders "
+                   "    JOIN blind_folders_all_upstream_ids "
+                   "        ON blind_folders.blind_folder_id = blind_folders_all_upstream_ids.blind_folder_id "
+                   "WHERE blind_folders_all_upstream_ids.reviewer_id=%s AND experiment_id=%s;",
+                   (reviewer_id, experiment_id))
+    return util.list_from_cursor(cursor.fetchall())

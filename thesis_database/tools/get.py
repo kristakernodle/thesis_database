@@ -45,16 +45,16 @@ def list_all_folders(experiment):
     return all_folders
 
 
-def list_all_masked_folders(experiment):
-    all_masked_folders = list()
+def list_all_blinded_folders(experiment):
+    all_blinded_folders = list()
     for folder_id in list_folder_ids_from_blind_folders(experiment):
-        all_masked_folders.append(models.Folder.from_db(folder_id=folder_id))
-    return all_masked_folders
+        all_blinded_folders.append(models.Folder.from_db(folder_id=folder_id))
+    return all_blinded_folders
 
 
 def list_all_not_blind_folders(experiment):
     all_folders = list_all_folders(experiment)
-    all_masked_folders = list_all_masked_folders(experiment)
+    all_masked_folders = list_all_blinded_folders(experiment)
     not_blind_folders = [folder for folder in all_folders if folder not in all_masked_folders]
     return not_blind_folders
 
@@ -77,3 +77,9 @@ def list_all_trial_dir(experiment):
 def list_all_blind_folder_ids(experiment):
     with Cursor() as cursor:
         return queries.list_all_blind_folder_ids(cursor, experiment.experiment_id)
+
+
+def list_all_blind_names_for_reviewer_experiment(reviewer, experiment):
+    with Cursor() as cursor:
+        return queries.list_all_blind_names_for_reviewer_experiment(cursor, reviewer.reviewer_id,
+                                                                    experiment.experiment_id)
