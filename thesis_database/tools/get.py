@@ -83,3 +83,9 @@ def list_all_blind_names_for_reviewer_experiment(reviewer, experiment):
     with Cursor() as cursor:
         return queries.list_all_blind_names_for_reviewer_experiment(cursor, reviewer.reviewer_id,
                                                                     experiment.experiment_id)
+
+
+def list_all_blinded_trial_full_paths_for_reviewer_experiment(reviewer, experiment):
+    with Cursor() as cursor:
+        return queries.list_all_blind_trials_full_paths_for_reviewer_experiment(cursor, reviewer.reviewer_id,
+                                                                                experiment.experiment_id)

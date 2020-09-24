@@ -37,10 +37,10 @@ def list_all_blind_folder_ids(cursor, experiment_id):
     return util.list_from_cursor(cursor.fetchall())
 
 
-def list_mouse_ids_for_experiment(cursor, experiment_id):
-    cursor.execute("SELECT mouse_id FROM all_participants_all_trials "
-                   "WHERE experiment_id = %s;", (experiment_id,))
-    return sorted(set(util.list_from_cursor(cursor.fetchall())), key=int)
+# def list_mouse_ids_for_experiment(cursor, experiment_id):
+#     cursor.execute("SELECT mouse_id FROM all_participants_all_trials "
+#                    "WHERE experiment_id = %s;", (experiment_id,))
+#     return sorted(set(util.list_from_cursor(cursor.fetchall())), key=int)
 
 
 def list_all_folder_ids_for_experiment(cursor, experiment_id):
@@ -114,5 +114,14 @@ def list_all_blind_names_for_reviewer_experiment(cursor, reviewer_id, experiment
                    "    JOIN blind_folders_all_upstream_ids "
                    "        ON blind_folders.blind_folder_id = blind_folders_all_upstream_ids.blind_folder_id "
                    "WHERE blind_folders_all_upstream_ids.reviewer_id=%s AND experiment_id=%s;",
+                   (reviewer_id, experiment_id))
+    return util.list_from_cursor(cursor.fetchall())
+
+
+def list_all_blind_trials_full_paths_for_reviewer_experiment(cursor, reviewer_id, experiment_id):
+    cursor.execute("SELECT full_path "
+                   "FROM blind_trials "
+                   "    JOIN blind_trials_all_upstream_ids "
+                   "        ON blind_trials.trial_id = blind_trials_all_upstream_ids.trial_id;",
                    (reviewer_id, experiment_id))
     return util.list_from_cursor(cursor.fetchall())
