@@ -72,3 +72,8 @@ def list_all_folder_dir(experiment):
 def list_all_trial_dir(experiment):
     with Cursor() as cursor:
         return queries.list_all_trial_dirs_for_experiment(cursor, experiment.experiment_id)
+
+
+def list_all_blind_folder_ids(experiment):
+    with Cursor() as cursor:
+        return queries.list_all_blind_folder_ids(cursor, experiment.experiment_id)
