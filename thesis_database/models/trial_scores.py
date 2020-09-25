@@ -67,16 +67,16 @@ class TrialScore:
             a_cursor.execute("INSERT INTO trial_scores (trial_id, reviewer_id, trial_num, "
                              "  reach_score, abnormal_movt_score, grooming_score) "
                              "VALUES (%s, %s, %s, %s, %s, %s);",
-                             (self.trial_id, self.reviewer_id, self.trial_num, self.reach_score,
-                              self.abnormal_movt_score, self.grooming_score))
+                             (self.trial_id, self.reviewer_id, int(self.trial_num), int(self.reach_score),
+                              bool(self.abnormal_movt_score), bool(self.grooming_score)))
 
         def update_db_entry(a_cursor):
             a_cursor.execute("UPDATE trial_scores "
                              "SET (trial_num, reach_score, abnormal_movt_score, grooming_score) "
-                             "  = (%s, %s, %s, %s, %s, %s) "
+                             "  = (%s, %s, %s, %s) "
                              "WHERE trial_id = %s AND reviewer_id = %s;",
-                             (self.trial_num, self.reach_score, self.abnormal_movt_score, self.grooming_score,
-                              self.trial_id, self.reviewer_id))
+                             (int(self.trial_num), int(self.reach_score), bool(self.abnormal_movt_score),
+                              bool(self.grooming_score), self.trial_id, self.reviewer_id))
 
         def save_to_db_main(a_cursor):
             if self.from_db(trial_id=self.trial_id, reviewer_id=self.reviewer_id) is None:
