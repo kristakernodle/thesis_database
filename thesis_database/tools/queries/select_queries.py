@@ -125,3 +125,10 @@ def list_all_blind_trials_full_paths_for_reviewer_experiment(cursor, reviewer_id
                    "        ON blind_trials.trial_id = blind_trials_all_upstream_ids.trial_id;",
                    (reviewer_id, experiment_id))
     return util.list_from_cursor(cursor.fetchall())
+
+
+def list_all_session_dir_for_for_experiment(cursor, experiment_id):
+    cursor.execute("SELECT session_dir "
+                   "FROM sessions "
+                   "WHERE experiment_id=%s;", (experiment_id,))
+    return util.list_from_cursor(cursor.fetchall())

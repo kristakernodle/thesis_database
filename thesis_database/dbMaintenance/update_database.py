@@ -37,7 +37,7 @@ def update_experiment_from_data_dirs(experiment):
             print('Need information about training and session directories for this experiment')
 
         # Get all session directories for sessions in database
-        session_dir_in_db = tools.get.list_all_session_dir(experiment, mouse)
+        session_dir_in_db = tools.get.list_all_session_dir_for_mouse(experiment, mouse)
 
         for session_dir in all_session_dirs:
             if session_dir in session_dir_in_db:

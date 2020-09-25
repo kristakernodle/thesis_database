@@ -59,7 +59,7 @@ def list_all_not_blind_folders(experiment):
     return not_blind_folders
 
 
-def list_all_session_dir(experiment, mouse):
+def list_all_session_dir_for_mouse(experiment, mouse):
     with Cursor() as cursor:
         return queries.list_all_session_dirs_for_mouse(cursor, mouse.mouse_id, experiment.experiment_id)
 
@@ -89,3 +89,8 @@ def list_all_blinded_trial_full_paths_for_reviewer_experiment(reviewer, experime
     with Cursor() as cursor:
         return queries.list_all_blind_trials_full_paths_for_reviewer_experiment(cursor, reviewer.reviewer_id,
                                                                                 experiment.experiment_id)
+
+
+def list_all_session_dir_for_experiment(experiment):
+    with Cursor() as cursor:
+        return queries.list_all_session_dir_for_for_experiment(cursor, experiment.experiment_id)
