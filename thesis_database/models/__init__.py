@@ -9,3 +9,4 @@ from .trials import Trial
 from .blind_folders import BlindFolder
 from .blind_trials import BlindTrial
 from .trial_scores import TrialScore
+from .session_score_counts import SessionScoreCount

@@ -42,8 +42,14 @@ def update_experiment_from_data_dirs(experiment):
         for session_dir in all_session_dirs:
             if session_dir in session_dir_in_db:
                 continue
+            session_dir_split = session_dir.split('T')
+            if len(session_dir_split) > 3:
+                session_num = session_dir_split[-2].split('-')[0]
+            else:
+                session_num = session_dir_split[-1]
             session_date = int(session_dir.name.split('_')[1])
-            models.Session(mouse.mouse_id, experiment.experiment_id, str(session_dir), session_date).save_to_db()
+            models.Session(mouse.mouse_id, experiment.experiment_id, str(session_dir), session_date,
+                           session_num).save_to_db()
 
         for session_dir in all_session_dirs:
             session = models.Session.from_db(session_dir=session_dir)

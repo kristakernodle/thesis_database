@@ -112,6 +112,28 @@ def create_trial_score_table(a_cursor):
                      "grooming_score bool not null);")
 
 
+# SESSION SCORE COUNT TABLE
+def create_session_score_count_table(a_cursor):
+    a_cursor.execute("""
+    CREATE TABLE session_score_counts(
+    session_score_count_id uuid default uuid_generate_v4() constraint session_score_count_pkey primary key,
+    session_id uuid references sessions not null,
+    reviewer_id uuid references reviewers not null,
+    score0 smallint,
+    score1 smallint,
+    score2 smallint,
+    score3 smallint,
+    score4 smallint,
+    score5 smallint,
+    score6 smallint,
+    score7 smallint,
+    score8 smallint,
+    score9 smallint,
+    abormal_movt_score smallint,
+    grooming_score smallint);
+    """)
+
+
 # CREATE ALL TABLES
 def create_all_tables_main(db_details, main_user):
     Database.initialize(database=db_details['database'],

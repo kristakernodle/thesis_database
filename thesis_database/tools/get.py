@@ -94,3 +94,13 @@ def list_all_blinded_trial_full_paths_for_reviewer_experiment(reviewer, experime
 def list_all_session_dir_for_experiment(experiment):
     with Cursor() as cursor:
         return queries.list_all_session_dir_for_for_experiment(cursor, experiment.experiment_id)
+
+
+def list_engaged_reaches_by_mouse_session():
+    with Cursor() as cursor:
+        return queries.list_engaged_reaches_by_mouse_session(cursor)
+
+
+def list_total_reaches_by_mouse_session():
+    with Cursor() as cursor:
+        return queries.list_total_reaches_by_mouse_session(cursor)
