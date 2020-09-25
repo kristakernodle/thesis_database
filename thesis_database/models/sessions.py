@@ -3,11 +3,12 @@ from thesis_database import utilities as util
 
 
 class Session:
-    def __init__(self, mouse_id, experiment_id, session_dir, session_date=None, session_id=None):
+    def __init__(self, mouse_id, experiment_id, session_dir, session_date=None, session_num=None, session_id=None):
         self.mouse_id = mouse_id
         self.experiment_id = experiment_id
         self.session_dir = session_dir
         self.session_date = util.convert_date_int_yyyymmdd(session_date)
+        self.session_num = session_num
         self.session_id = session_id
 
     def __str__(self):
@@ -20,6 +21,7 @@ class Session:
                     self.experiment_id == compare_to.experiment_id,
                     self.session_dir == compare_to.session_dir,
                     self.session_date == compare_to.session_date,
+                    self.session_num == compare_to.session_num,
                     self.session_id == compare_to.session_id])
 
     @classmethod
@@ -44,7 +46,7 @@ class Session:
             if session_data is None:
                 return None
             return cls(mouse_id=session_data[1], experiment_id=session_data[2], session_date=session_data[3],
-                       session_dir=session_data[4], session_id=session_data[0])
+                       session_dir=session_data[4], session_num=session_data[5], session_id=session_data[0])
 
         if testing:
             with TestingCursor(postgresql) as cursor:
@@ -56,15 +58,15 @@ class Session:
     def save_to_db(self, testing=False, postgresql=None):
 
         def insert_into_db(a_cursor):
-            a_cursor.execute("INSERT INTO sessions (mouse_id, experiment_id, session_date, session_dir) "
-                             "VALUES (%s, %s, %s, %s);",
-                             (self.mouse_id, self.experiment_id, self.session_date, self.session_dir))
+            a_cursor.execute("INSERT INTO sessions (mouse_id, experiment_id, session_date, session_dir, session_num) "
+                             "VALUES (%s, %s, %s, %s, %s);",
+                             (self.mouse_id, self.experiment_id, self.session_date, self.session_dir, self.session_num))
 
         def update_db_entry(a_cursor):
             a_cursor.execute("UPDATE sessions "
-                             "SET (session_date, session_dir) = (%s, %s) "
+                             "SET (session_date, session_dir, session_num) = (%s, %s, %s) "
                              "WHERE session_id = %s;",
-                             (self.session_date, self.session_dir, self.session_id))
+                             (self.session_date, self.session_dir, self.session_num, self.session_id))
 
         def save_to_db_main(a_cursor):
             return_session_id = self.from_db(session_id=self.session_id)

@@ -55,7 +55,8 @@ def create_sessions_table(a_cursor):
                      "mouse_id uuid references mouse not null,"
                      "experiment_id uuid references experiments not null,"
                      "session_date date not null,"
-                     "session_dir varchar(255) not null);")
+                     "session_dir varchar(255) not null,"
+                     "session_num smallint);")
     a_cursor.execute("create unique index sessions_session_dir_uindex on sessions (session_dir);")
 
 
