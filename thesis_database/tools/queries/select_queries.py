@@ -146,7 +146,7 @@ def list_engaged_reaches_by_mouse_session(cursor):
         INNER JOIN sessions ON sessions.session_id = engaged_reaching_score_count_by_session.session_id
         INNER JOIN mouse ON mouse.mouse_id = sessions.mouse_id;
         """)
-    return util.list_from_cursor(cursor.fetchall())
+    return util.list_of_tups_from_cursor(cursor.fetchall())
 
 
 def list_total_reaches_by_mouse_session(cursor):
@@ -161,4 +161,4 @@ def list_total_reaches_by_mouse_session(cursor):
         INNER JOIN sessions ON sessions.session_id = engaged_reaching_score_count_by_session.session_id
         INNER JOIN mouse ON mouse.mouse_id = sessions.mouse_id;
         """)
-    return util.list_from_cursor(cursor.fetchall())
+    return util.list_of_tups_from_cursor(cursor.fetchall())

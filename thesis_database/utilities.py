@@ -71,6 +71,10 @@ def list_from_cursor(cursor_fetch):
     return list(item for tup in cursor_fetch for item in tup)
 
 
+def list_of_tups_from_cursor(cursor_fetch):
+    return cursor_fetch
+
+
 def read_config(yaml_full_path):
     with open(yaml_full_path) as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
