@@ -1,6 +1,6 @@
 from thesis_database.tools import Cursor
 import thesis_database.models as models
-import thesis_database.tools.queries.select_queries as queries
+import thesis_database.tools.queries_dir.select_queries as queries
 
 
 def list_reviewer_ids():

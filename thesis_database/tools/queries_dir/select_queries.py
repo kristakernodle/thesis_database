@@ -1,8 +1,12 @@
 from thesis_database import utilities as util
 
 
+def construct_basic_select(column_name, table_name):
+    return " ".join(["SELECT", column_name, "FROM", f"{table_name};"])
+
+
 def list_all_experiment_names(cursor):
-    cursor.execute("SELECT experiment_name FROM experiments;")
+    cursor.execute(construct_basic_select(column_name='experient_name', table_name='experiments'))
     return util.list_from_cursor(cursor.fetchall())
 
 
@@ -22,7 +26,8 @@ def list_all_reviewer_ids(cursor):
 
 
 def list_all_experiment_ids(cursor):
-    cursor.execute("SELECT experiment_id FROM experiments;")
+    select = construct_basic_select(column_name='experiment_id', table_name='experiments')
+    cursor.execute(select)
     return util.list_from_cursor(cursor.fetchall())
 
 
@@ -93,7 +98,7 @@ def list_all_session_dirs_for_mouse(cursor, mouse_id, experiment_id):
 
 
 def list_all_folder_dirs_for_experiment(cursor, experiment_id):
-    cursor.execute("SELECT folder_dir "
+    cursor.execute("SELECT folders.folder_dir "
                    "FROM folders "
                    "    JOIN folders_all_upstream_ids "
                    "        ON folders.folder_id = folders_all_upstream_ids.folder_id "
